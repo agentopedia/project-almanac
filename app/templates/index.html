@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="../static/globals.css" />
+    <link rel="stylesheet" href="../static/styleguide.css" />
+    <link rel="stylesheet" href="../static/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../static/img/magic_button.svg" type="image/x-icon">
+    <title>Agentville</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000; /* Set the background color to black */
+            color: #fff; /* Set the text color to white */
+        }
+
+        /* Add the following styles for the user input text box */
+        .future-state-INPUT input[type="text"]{
+          width: 125%; /* Make the input and submit button take up full width */
+            padding: 10px; /* Add some padding for better aesthetics */
+            margin-bottom: 10px; /* Add margin at the bottom for spacing */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            font-size: 16px; /* Adjust the font size */
+          border-radius: 20px;
+
+        }
+        .future-state-INPUT input[type="submit"],
+       .future-state-INPUT input[type="button"],
+       .future-state-INPUT .almanac-button {
+            width: 120%; /* Make the input and submit button take up full width */
+            padding: 10px; /* Add some padding for better aesthetics */
+            margin-bottom: 10px; /* Add margin at the bottom for spacing */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            font-size: 16px; /* Adjust the font size */
+          border-radius: 20px;
+          background: linear-gradient(135deg, #4a90e2, #007bff); /* Gradient background */
+          color: #fff;
+          cursor: pointer;
+          display: block; /* Center-align the button */
+          margin: 0 auto; /* Center-align the button */
+          text-align: center;
+          text-decoration: none; /* Remove underline from links */
+          line-height: 24px; /* Vertically center text in link button */
+        }
+
+      #log {
+          margin-top: 20px;
+          text-align: center;
+      }
+      .logo-container {
+          text-align: center;
+          margin-top: 20px;
+      }
+
+      .logo-container img {
+          max-width: 100%; /* Ensure the logo doesn't exceed its container's width */
+          height: auto; /* Maintain the aspect ratio */
+      }
+      .welcome-heading {
+          text-align: center;
+          font-size: 24px; /* Adjust font size as needed */
+          margin-top: 20px; /* Adjust margin as needed */
+         font-family: 'Google Sans', sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="future-state-INPUT">
+      <div class="div">
+        <div class="overlap-group">
+          <div class="logo-container">
+              <!-- Replace the text with your SVG logo -->
+              <img src="../static/img/agent_logo.png" alt="Agentville Logo">
+          </div>
+          <h1 class="welcome-heading">
+          Welcome to Agentville Almanac Creator! Build an almanac of personalized learning experiences</h1>
+        </div>
+       <div class="rectangle">
+            <a href="/add" class="almanac-button">Create your own Almanac (Research Preview)</a>
+
+            <div id="log"></div>
+
+      <!--  <div class="button-dark"> -->
+      <!-- </form> -->
+    </div>
+  </body>
+</html>
