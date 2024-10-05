@@ -1,0 +1,126 @@
+.future-state-INPUT {
+  background-color: #131314;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+}
+
+.future-state-INPUT .div {
+  background-color: #131314;
+  width: 1400px;
+  height: 800px;
+  position: relative;
+  border-radius: 20px;
+}
+
+.future-state-INPUT .overlap-group {
+  position: absolute;
+  width: 561px;
+  height: 168px;
+  top: 82px;
+  left: 419px;
+  text-align: center;
+}
+
+.future-state-INPUT .text-wrapper {
+  position: absolute;
+  width: 561px;
+  top: 39px;
+  left: 0;
+  font-family: "Google Sans-Bold", Helvetica;
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 96px;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.future-state-INPUT .text-wrapper-2 {
+  position: absolute;
+  width: 561px;
+  top: 0;
+  left: 0;
+  font-family: "Google Sans-Regular", Helvetica;
+  font-weight: 400;
+  color: #ffffff;
+  font-size: 40px;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.future-state-INPUT .rectangle {
+  position: absolute;
+  width: 706px;
+  height: 56px;
+  top: 372px;
+  left: 258px;
+  background-color: #131314;
+  border-radius: 20px;
+  margin: 0 auto; 
+  text-align: center;
+
+}
+
+.future-state-INPUT .what-would-you-like {
+  position: absolute;
+  width: 840px;
+  top: 341px;
+  left: 283px;
+  font-family: "Google Sans-Regular", Helvetica;
+  font-weight: 400;
+  color: #ffffff;
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.future-state-INPUT .button-dark {
+  display: flex;
+  flex-direction: column;
+  width: 162px;
+  height: 56px;
+  align-items: center; 
+  position: absolute;
+  top: 372px;
+  left: 984px;
+  background-color: var(--gm-3sysdarkprimary);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.future-state-INPUT .state-layer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 24px;
+  position: relative;
+  flex: 1;
+  align-self: stretch;
+  width: 100%;
+  flex-grow: 1;
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.future-state-INPUT .button-magic {
+  position: relative;
+  width: 24px;
+  height: 24px;
+}
+
+.future-state-INPUT .label-text {
+  position: relative;
+  width: fit-content;
+  font-family: "Google Sans Text-Medium", Helvetica;
+  font-weight: 500;
+  color: #062e6f;
+  font-size: 20px;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: 20px;
+  white-space: nowrap;
+}
