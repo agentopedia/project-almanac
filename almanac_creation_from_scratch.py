@@ -7,48 +7,25 @@ Original file is located at
     https://colab.research.google.com/drive/1G7xw-uyAg0Ls6SodgGGi_FaX5kvykFnN?resourcekey=0-ggYKMsVlCx6Fuxs1XmCE4g
 """
 
-pip install -qU langchain-openai langchain langchain_community openai
+# pip install -qU langchain-openai langchain langchain_community openai
 
-import getpass
 import os
-
-os.environ["OPENAI_API_KEY"] = ""
-os.environ['TAVILY_API_KEY'] = ''
+import random
 
 from langchain_openai import ChatOpenAI
-
-llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
-
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.prompts import ChatPromptTemplate
 
-tools = [TavilySearchResults(max_results=1)]
-
-prompt = ChatPromptTemplate.from_messages(
-    [
-        (
-            "system",
-            "You are a helpful assistant. Make sure to use the tavily_search_results_json tool for information.",
-        ),
-        ("placeholder", "{chat_history}"),
-        ("human", "{input}"),
-        ("placeholder", "{agent_scratchpad}"),
-    ]
-)
-
-# Construct the Tools agent
-agent = create_tool_calling_agent(llm, tools, prompt)
-
-# Create an agent executor by passing in the agent and tools
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
-agent_executor.invoke({"input": "what is LangChain?"})
-
-import random
 from collections import defaultdict
-
 from openai import OpenAI
+
+os.environ["OPENAI_API_KEY"] = "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"
+os.environ['TAVILY_API_KEY'] = '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'
 client = OpenAI()
+
+llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
+tools = [TavilySearchResults(max_results=1)]
 
 def model_response(text):
     completion = client.chat.completions.create(
@@ -61,29 +38,61 @@ def model_response(text):
         }
     ]
 )
-
     return completion.choices[0].message.content
 
-# Hypothetical function to get model responses
-
-
 def agent_response(text_input):
-   output = agent_executor.invoke({"input": text_input})
-   return output
+    parts = text_input.split("As a ")
+    if len(parts) < 2:
+        raise ValueError("Input text does not contain an agent type.")
+    agentType = parts[1].split(",")[0].strip()
+    print(agentType)
+    prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            f"You are an expert specializing in {agentType}. Make sure to use the tavily_search_results_json tool for information.",
+        ),
+        ("placeholder", "{chat_history}"),
+        ("human", "{input}"),
+        ("placeholder", "{agent_scratchpad}"),
+    ]
+    )
+    agent = create_tool_calling_agent(llm, tools, prompt)
+    agentExecutor = AgentExecutor(agent = agent, tools = tools, verbose = True)
+    output = agentExecutor.invoke({"input": text_input})
+    return output
 
 class PlannerAgent:
     def __init__(self):
         self.sub_tasks = []
 
     def break_down_problem(self, problem):
-        # Dynamically create sub-tasks (for simplicity, fixed 3 here)
+        task_list = model_response(f''' 
+        
+        You are an expert planner. Your task is to break down the following problem into three detailed sub-tasks:
+        Problem: {problem}
+        
+        Example of a breakdown:
+        
+        Problem: Analyze the effects of climate change.
+        Sub-tasks: 
+          1. Research current climate trends and statistics.
+          2. Analyze the impact of climate change on agriculture.
+          3. Develop a report summarizing the findings and proposing solutions.
 
-        task_list = model_response(f'''Break down the problem:{problem} provided into 3 sub-tasks and return the sub tasks in the form of a list. Here are the rules:
-        1.Each of the steps should be as specific and narrow to the problem at hand
-        2.These three steps when executed step-by-step should lead to the final solution
-        3.Make assumptions and put as much detail as possible in each of the sub-tasks
-        Here is the format: [step 1; step 2; step 3]''')
-        self.sub_tasks = task_list.split(';')
+        Please ensure:
+         1. Each sub-task is specific, actionable, and leads towards solving the overall problem.
+         2. Include any necessary assumptions and context relevant to each sub-task.
+         3. Format the output as a list of sub-tasks, separated by semicolons.
+            Here is the expected format: [sub-task 1; sub-task 2; sub-task 3]
+        ''')
+        
+        # Validating output format
+        if task_list.startswith('[') and task_list.endswith(']'):
+            self.sub_tasks = task_list[1:-1].split(';')
+            self.sub_tasks = [sub_task.strip() for sub_task in self.sub_tasks] 
+        else:
+            raise ValueError("The output format is incorrect. Expected format: [sub-task 1; sub-task 2; sub-task 3]")
 
 def choose_agent(task):
     # Logic for choosing the best agent based on the task
@@ -91,14 +100,13 @@ def choose_agent(task):
     agents = ['Researcher', 'Expert', 'Product Manager', 'Mathematician', 'Marketer', 'Teacher']
     return random.choice(agents)
 
-
 class TaskAgent:
     def __init__(self, name):
         self.name = name
 
     def execute_task(self, task):
-        # Simulate task execution and return model response
-        return agent_response(f'Execute {task} as {self.name}')
+        prompt = f"As a {self.name}, this is your provided task: {task}. Make sure to provide a detailed and thoughtful response."
+        return agent_response(prompt)
 
 class CritiqueAgent:
     def __init__(self):
@@ -151,3 +159,19 @@ if __name__ == "__main__":
     print("Final Result:")
     print(final_result)
 
+    # # Testing Output Validation
+
+    # task_list = "[Research current climate trends and statistics.; Analyze the impact of climate change on agriculture.; Develop a report summarizing the findings and proposing solutions.]"
+    # if task_list.startswith('[') and task_list.endswith(']'):
+    #     sub_tasks = task_list[1:-1].split(';')
+    #     sub_tasks = [sub_task.strip() for sub_task in sub_tasks] 
+    #     print(sub_tasks)
+    # else:
+    #     raise ValueError("The output format is incorrect. Expected format: [sub-task 1; sub-task 2; sub-task 3]")
+    
+    # # Testing AgentType Extraction
+
+    # sub_task = "Say Hi"
+    # agent_name = choose_agent(sub_task)
+    # agent = TaskAgent(agent_name)
+    # output = agent.execute_task(sub_task)
