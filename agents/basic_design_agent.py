@@ -9,6 +9,7 @@ _ = load_dotenv() #loading environment
 # create a .env file that has OPENAI_API_KEY=(your key here)
 api_key = os.getenv("OPENAI_API_KEY")
 openai.api_key = api_key
+print(api_key)
 client = OpenAI()
 
 # testing the api key out
@@ -25,9 +26,9 @@ client = OpenAI()
 # print(response.choices[0].message["content"])
 
 design_profiling = """"
-Imagine you are a project manager who must utilize design thinking to generate customer personas, create empathy maps, and expand the problem definition. 
+Imagine you are a product manager who must utilize design thinking to generate customer personas, create empathy maps, and expand the problem definition. 
 Design thinking emphasizes human thinking design and focuses on the solution to the problem rather than the problem itself. 
-Giving a description of a product, create three customer personas to give insight into the type of users that could potentially benefit from the specified product. 
+Given a description of a product, create three customer personas to give insight into the type of users that could potentially benefit from the specified product. 
 Describe each customer person and list out their needs and pain points.
 Then, gather and list out the information necessary to create empathy maps for each of these users by researching to understand the users’ emotions and challenges. An empathy map consists of what a user says, thinks, does, and feels.
 Also, gather and list out the information necessary to create a customer journey map. A customer journey map consists of 4 stages: awareness, comparison, purchase, and installation
