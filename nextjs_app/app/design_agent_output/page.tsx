@@ -19,19 +19,24 @@ const data = {
 };
 
 export default function DesignThinkingAgentOutput() {
-    return (
-    <div style={{ padding: "2rem", color: "white", backgroundColor: "#222222", minHeight: "100vh", textAlign: "center" }}>
-        {/* Title */}
-        <main style={{ marginTop: "2rem" }}>
-          <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>Design Thinking Agent</h1>
-          <p style={{ fontSize: "1.25rem", marginBottom: "2rem" }}>TODO Put output in text form</p>
-          <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-6">
-            <EmpathyMap empathyData={data.empathy_map}/>
-          </div>
-          <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-6">
-            <CustomerJourney journeyData={data.customer_journey} />
-          </div>
-        </main>
+  return (
+    <div style={{ padding: "1rem", color: "white", backgroundColor: "#222222", minHeight: "100vh", textAlign: "center" }}>
+      <main style={{ marginTop: "2rem" }}>
+        <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>Design Thinking Agent</h1>
+
+        {/* Flex container for side-by-side layout */}
+        <div className="flex-container">
+          <EmpathyMap empathyData={data.empathy_map} />
+          <CustomerJourney journeyData={data.customer_journey} />
+        </div>
+
+        {/* Navigation Button */}
+        <Link href="/business_model_agent">
+          <button className="button mt-8" style={{ padding: "0.75rem 1.5rem", fontSize: "1rem", borderRadius: "0.25rem" }}>
+            Proceed to Business Model Agent
+          </button>
+        </Link>
+      </main>
     </div>
   );
 }
