@@ -11,7 +11,7 @@ from pydrive2.drive import GoogleDrive
 
 from typing import TypedDict, Annotated
 
-openai_api_key = os.environ["OPENAI_API_KEY"]
+gemini_api_key = os.environ["GEMINI_API_KEY"]
 tavily_api_key = os.environ['TAVILY_API_KEY']
 secret_file = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
@@ -33,6 +33,7 @@ class BusinessModelState(TypedDict):
 
 class BusinessModelAgent:
     jsonFormat = {
+        "target_market": [],
         "customer_segments": [],
         "value_propositions": [],
         "channels": [],
@@ -46,6 +47,7 @@ class BusinessModelAgent:
 
     prompt = f"""You are a strategic business analyst tasked with creating a comprehensive business model canvas for a product. 
     Based on a provided problem statement, describe the following components of a business model canvas:
+    0. Target Market: What is the target market?
     1. Customer Segments: Who are the customers?
     2. Value Propositions: What value does the product provide?
     3. Channels: How does the product reach customers?
