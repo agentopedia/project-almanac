@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from design_agent import Agent, ChatOpenAI, TavilySearchResults, HumanMessage, tool
+# from design_agent import Agent, ChatOpenAI, TavilySearchResults, HumanMessage, tool
 
 app = Flask(__name__)
 
@@ -19,19 +19,21 @@ Give output in json, using the following json format:
 """
 
 # Initialize the model and agent
-model = ChatOpenAI(model="gpt-3.5-turbo")
-agent = Agent(model, [tool], system=prompt)
+# model = ChatOpenAI(model="gpt-3.5-turbo")
+# agent = Agent(model, [tool], system=prompt)
 
 @app.route('/design_input', methods=['POST'])
 def run_agent():
     data = request.json
     query = data['query']
     print(query)
-    messages = [HumanMessage(content=query)]
-    # Call your agent with the provided query
-    result = agent.graph.invoke({"messages": messages})
+    # messages = [HumanMessage(content=query)]
+    # # Call your agent with the provided query
+    # result = agent.graph.invoke({"messages": messages})
 
-    print(result['messages'][-1].content)
+    # print(result['messages'][-1].content)
+    response = {"message": "Query received", "query": query}
+    return jsonify(response), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
