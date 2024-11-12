@@ -1,6 +1,28 @@
+"use client";
 import Link from 'next/link';
+import { useState } from 'react';
+import React from 'react';
 
 export default function DesignThinkingAgentInput() {
+  const [inputText, setInputText] = useState('');
+  const [response, setResponse] = useState('');
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    console.log('entered handle submit');
+    // POST request to the API route with the input text
+    const res = await fetch('/api/design_input', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query: inputText }),
+    });
+
+    const data = await res.json();
+    setResponse(data.result);
+  };
+
   return (
     <div style={{ padding: "1rem", color: "white", backgroundColor: "#222222", minHeight: "100vh", textAlign: "center" }}>
       <main style={{ marginTop: "2rem" }}>
@@ -34,3 +56,4 @@ export default function DesignThinkingAgentInput() {
     </div>
   );
 }
+// export default page;
