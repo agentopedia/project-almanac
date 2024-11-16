@@ -52,19 +52,41 @@
             display: block; /* Center-align the button */
             margin: 0 auto; /* Center-align the button */
         }
+
+        
+    </style>
+    <style>
+        /* Spinner Styles */
+        .spinner {
+            display: none; /* Initially hidden */
+            margin: 0 auto; /* Centering the spinner */
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
-<body>
-    <h1>Add a new Almanac (Research Preview)</h1>
-    <form method="POST">
-        <label for="name">Name of the Almanac</label>
-        <input type="text" id="name" name="name" required>
-        <br>
-        <label for="description">Description of what the Almanac is about</label>
-        <textarea id="description" name="description" rows="10" cols="50" placeholder="Build a web application that teaches Spanish using flash cards" required></textarea>
-        <br>
-        <input type="submit" value="Submit">
-    </form>
-</body>
-</html>
+    <body style="font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px;">
+        <h1 style="text-align: center; color: #4A90E2;">🚀 Idea to MVP Generator</h1>
+        <p style="text-align: center; font-size: 18px; color: #333;">Transform your vision into a working MVP in minutes!</p>
 
+        <form method="POST" style="max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <label for="name" style="font-size: 16px; color: #333;">🎯 Give your product a name</label>
+            <input type="text" id="name" name="name" placeholder="e.g., FlashLearn: Spanish in a Flash" style="width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px;" required>
+
+            <label for="description" style="font-size: 16px; color: #333;">📝 Describe the problem you're solving</label>
+            <textarea id="description" name="description" rows="6" placeholder="e.g., Create a web app that helps users learn Spanish through interactive flashcards and quizzes." style="width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px;" required></textarea>
+
+            <input type="submit" value="Start building" style="width: 100%; background-color: #4A90E2; color: white; padding: 12px 20px; font-size: 18px; border: none; border-radius: 5px; cursor: pointer;">
+        </form>
+    </body>
+
+</html>
