@@ -1,3 +1,4 @@
+from flask_sqlalchemy import SQLAlchemy
 import os
 from flask import Flask, jsonify,render_template, request, redirect, url_for, session
 import requests
@@ -8,10 +9,16 @@ import os
 from flask_cors import CORS
 from tavily import TavilyClient
 from replit import db
+
 #from langchain.retrievers.tavily_search_api import TavilySearchAPIRetriever
 app = Flask(__name__)
 CORS(app)
 app.config['SECRET_KEY'] = 'secret!'
+
+
+def memory_add(text):
+    memory = model_response(f'''Given the follwing text, analyze it and extract the items that are relevant to building an MVP application: {text}''')
+    return memory
 
 import google.generativeai as genai
 
@@ -109,6 +116,10 @@ model_gen = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",
 def model_response(text):
    response = model_gen.generate_content(text)
    return response.text
+
+def research_agent(text):
+    response = model_response(f'''Given the problem statement: {text}, perform research that will help you to solve the problem.''')
+    
 
 @app.route('/')
 def index():
@@ -360,15 +371,62 @@ def almanac(name):
         description = session['description']
         session['name'] = name
         url = session['url']
-        
-            #search_content = generate_search(description)
-            
-        
-           # search_content = model_response(f'''Imagine you are a search engine capable of extracting relevant content from your knowledge base based on the topics mentioned in the description: {description}. This extracted content will then be used to build a web application.''')
-        search_content = '''Imagine yourself to be a search engine capable of extracting relevant content from your knowledgebase based on the topics mentioned in the description: {description}. This extracted content will then be used to build a web application '''
-        content = model_response(f'''Imagine you are a front-end engineer expert in bootstrap. Generate bootstrap html code based on the description:{description}. Use the context from search results: {search_content} pertaining to the description for populating the landing page. 
+        content = model_response(f'''Imagine you are a Design thinking expert. Generate Related problem, Empathy map and customer journey map corresponding to the problem:{description}. 
 
-Come up with a PRD to build a multi-page web application that includes all the different CUJs that are possible.  The primary objective is to make sure that clicking any button on the home page as part of the CUJ redirects the user to the /model endpoint. You also need to generate hidden input elements with the name 'button_name' in every form to capture the names of the buttons in the form. These names will also be sent to the /model end point when the user clicks on the buttons.
+Constraints:
+1.Output should be in bootstrap html code
+2.Do not generate a description of the code
+3.Do not generate html codeticks
+4.Do not output the plan or the PRD
+5.Never use placeholder texts as examples. Always approximate the real-orld scenarios as examples based on the context of the webpage.
+6. Do not generate images. If needed generate ascii art that approximate the images
+7.For the related problem section in the report, briefly describe the domain (e.g., healthcare, finance, e-commerce) where a similar issue has emerged. For instance, if the problem is about improving user onboarding for a software platform, a relevant domain might be the EdTech or FinTech sectors, where user engagement and retention are critical challenges.
+
+Similar Problem: Outline a problem within that domain that closely resembles the current one. Include details such as:
+
+Challenges Faced: Summarize the main obstacles encountered, like user resistance, lack of awareness, or onboarding complexity.
+Implications: Explain how these challenges impact key metrics or outcomes within that domain (e.g., low retention rates, high churn).
+Approach Taken and Outcomes: Highlight any successful or notable approaches used to address this problem, if available. Include specifics about the process (e.g., customer segmentation, customized onboarding paths, or rewards for milestones) and results, such as improved engagement rates or streamlined experiences
+
+
+
+''')
+        content_final = remove_html_and_backticks(content)
+        session['html_code'] = content_final
+        add_record("almanac",name,description,session['url'],content_final)
+    return render_template('almanac_app.html',name=content_final,almanac=name,url=url)
+
+@app.route('/prd', methods=['GET', 'POST'])
+def prd():
+
+    if request.method == 'POST':
+         empathy_map = request.form.get('html_content')
+         print ("Session code",empathy_map)
+         content = model_response(f'''Imagine you are a Product manager. Based on the empathy map: {empathy_map}, come up with a product requirements document. The product requirements document needs to be rendered in bootstrap html code. Make assumptions about real-world problems and use the empathy map to guide the design.
+
+        Constraints:
+        1.Do not generate a description of the code
+        2.Do not generate html codeticks
+
+
+
+
+        ''')
+         content_final = remove_html_and_backticks(content)
+         session['html_code'] = content_final
+
+         print (content_final)
+    return render_template('prd.html',prd=content_final)
+
+@app.route('/mvp', methods=['GET', 'POST'])
+def mvp():
+
+    if request.method == 'POST':
+         prd_content = request.form.get('prd_content')
+         print ("PRD content",prd_content)
+         content = model_response(f'''Imagine you are a front-end engineer expert in bootstrap. Generate bootstrap html code based on the requirements outlined in the prd:{prd_content}. 
+
+The multi-page web application should include all the different CUJs that are possible.  The primary objective is to make sure that clicking any button on the home page as part of the CUJ redirects the user to the /model endpoint. You also need to generate hidden input elements with the name 'button_name' in every form to capture the names of the buttons in the form. These names will also be sent to the /model end point when the user clicks on the buttons.
 Constraints:
 1.Do not generate a description of the code
 2.Do not generate html codeticks
@@ -596,11 +654,17 @@ Utilize spacing, border, and visibility utilities to ensure consistent design ac
 Create custom animations, transitions, and hover effects using CSS utility classes for enhancing UI interactions.
 Make sure to deliver a highly modular code structure, keeping components reusable and easy to maintain. The application should be optimized for both desktop and mobile devices, taking advantage of Bootstrap’s built-in responsive design capabilities.
 
-''')
-        content_final = remove_html_and_backticks(content)
-        session['html_code'] = content_final
-        add_record("almanac",name,description,session['url'],content_final)
-    return render_template('almanac_app.html',name=content_final,almanac=name,url=url)
+
+
+
+        ''')
+         content_final = remove_html_and_backticks(content)
+         session['html_code'] = content_final
+         #add_record()
+         print (content_final)
+         #session['memory'] = memory_add(content_final)
+    return render_template('mvp.html',mvp_content=content_final)
+
 
 def generate_search(description):
     search_queries = model_response(f'''Given the description: {description} for a web application, generate a search query that would retrieve the relevant content. 
@@ -636,7 +700,7 @@ def model():
 
     html_code = session['html_code']
     problem = session['description']
-    input_problem = model_response(f'''Imagine you are an expert in generating Bootstrap HTML code. User has clicked a button and submitted input to you. Analyze why the user clicked on this button and estimate the output he might be expecting. Your job is to process the input as a large language model and generate the html code that contains the output.  You are supposed to just generate the html code - nothing else. Do not generate explanations of the code. Here are the steps to follow along with sample query and answers. The generated html code should also contain buttons that will help the user interact with the generated content.
+    input_problem = model_response(f'''Imagine you are an expert in generating Bootstrap HTML code. User has clicked a button and submitted input to you.Analyze why the user clicked on this button and estimate the output he might be expecting. Your job is to process the input as a large language model and generate the html code that contains the output.  You are supposed to just generate the html code - nothing else. Do not generate explanations of the code. Here are the steps to follow along with sample query and answers. The generated html code should also contain buttons that will help the user interact with the generated content.
 
     Avoid using placeholder text like 'here is the sample question.' Instead, make realistic assumptions about real-world scenarios and provide genuine queries as examples.
     
@@ -748,6 +812,8 @@ Given the generated query, provide the answer. Based on the answer and the {html
     name = session['name']
     content = remove_html_and_backticks(input_problem)
     session['html_code'] = content
+    #new_memory = memory_add(content)
+    #session['memory'] = memory + new_memory
     return render_template('almanac.html',name=content,almanac=name,url=session['url'])
 
 def remove_html_and_backticks(input_text):
