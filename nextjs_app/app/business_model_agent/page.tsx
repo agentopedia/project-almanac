@@ -1,14 +1,147 @@
-import Link from 'next/link';
+"use client"
+import { useState } from "react";
 
-export default function BusinessModelAgent() {
+const ProductViability = () => {
+  const [activeSection, setActiveSection] = useState<string>("Introduction");
+
+  const sections = [
+    "Introduction",
+    "Goals",
+    "Target Audience",
+    "Product Features",
+    "Functional Requirements",
+    "Nonfunctional Requirements",
+  ];
+
   return (
-    <div style={{ padding: "1rem", color: "white", backgroundColor: "#222222", minHeight: "100vh", textAlign: "center" }}>
-      <main style={{ marginTop: "2rem" }}>
-        <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>Business Model Agent</h1>
-        <p style={{ fontSize: "1.25rem", marginBottom: "2rem" }}>Define and refine the business model for your product based on insights gathered.</p>
-        
-        {/* TODO */}
-      </main>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh", fontFamily: "Arial, sans-serif" }}>
+      {/* Header */}
+      <header
+        style={{
+          background: "#222",
+          color: "#ffff",
+          padding: "20px",
+          textAlign: "center",
+        }}
+      >
+        <h1 style={{ margin: "0", fontSize: "30px" }}>Product Viability</h1>
+        <p style={{ margin: "5px 0", fontSize: "20px" }}>Define your product requirements</p>
+        <a
+          href="/path-to-pdf"
+          download="[Product Name].pdf"
+          style={{
+            color: "#007bff",
+            textDecoration: "none",
+            fontSize: "20px",
+          }}
+        >
+          [Product Name].pdf
+        </a>
+      </header>
+
+      {/* Content Area */}
+      <div style={{ display: "flex", flex: "1" }}>
+        {/* Sidebar */}
+        <aside
+          style={{
+            width: "180px", // Adjusted sidebar width
+            background: "#222",
+            color: "#fff",
+            padding: "20px",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {sections.map((section) => (
+            <button
+              key={section}
+              onClick={() => setActiveSection(section)}
+              style={{
+                background: activeSection === section ? "#444" : "transparent",
+                color: "#fff",
+                border: "none",
+                textAlign: "left",
+                marginBottom: "10px",
+                padding: "10px",
+                cursor: "pointer",
+                borderRadius: "5px",
+              }}
+            >
+              {section}
+            </button>
+          ))}
+        </aside>
+
+        {/* Main Content */}
+        <main
+          style={{
+            flex: 3, // Increased flex value for the main content area
+            background: "#f4f4f4",
+            padding: "40px", // Increased padding for better layout
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              padding: "20px",
+              borderRadius: "5px",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <h2 style={{ color: "#333" }}>{activeSection}</h2>
+            <p style={{ color: "#666" }}>
+              This is the content for the {activeSection} section.
+            </p>
+          </div>
+        </main>
+      </div>
+
+      {/* Footer Buttons */}
+      <footer
+        style={{
+          position: "absolute",
+          bottom: "20px",
+          left: "calc(180px + 40px)", // Adjusted for smaller sidebar
+          display: "flex",
+          gap: "10px",
+        }}
+      >
+        <button
+          style={{
+            background: "#007bff",
+            color: "#fff",
+            padding: "10px 20px",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+          onClick={() => {
+            const currentIndex = sections.indexOf(activeSection);
+            if (currentIndex > 0) setActiveSection(sections[currentIndex - 1]);
+          }}
+        >
+          Back
+        </button>
+        <button
+          style={{
+            background: "#007bff",
+            color: "#fff",
+            padding: "10px 20px",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+          onClick={() => {
+            const currentIndex = sections.indexOf(activeSection);
+            if (currentIndex < sections.length - 1)
+              setActiveSection(sections[currentIndex + 1]);
+          }}
+        >
+          Next
+        </button>
+      </footer>
     </div>
   );
-}
+};
+
+export default ProductViability;

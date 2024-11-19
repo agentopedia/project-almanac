@@ -7,6 +7,7 @@ class AgentState(TypedDict):
     messages: Annotated[list[AnyMessage], operator.add]
 
 class Agent:
+    
     def __init__(self, model, tools, system=""):
         self.system = system 
         graph = StateGraph(AgentState) #initalizing state graph with agent state, has no nodes
