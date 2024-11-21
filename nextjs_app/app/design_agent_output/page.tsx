@@ -51,8 +51,9 @@ const data = {
 };
 
 export default function DesignThinkingAgentOutput() {
+  //if you want to use dummy data, comment out everything above const router = useRouter();
   const searchParams = useSearchParams();
-  const result = searchParams.get('result'); // Get 'result' query parameter
+  const result = searchParams.get('result'); // Get 'result' query parameter from URL
   let parsedData;
   if (result) {
     try {
@@ -64,10 +65,31 @@ export default function DesignThinkingAgentOutput() {
       console.error('Json not formatted correctly:', error);
     }
   }
-  // console.log('Raw Result:', result); 
-  // console.log('Parsed Data:', parsedData)
-  // console.log("result: ", parsedData.result)
+  console.log('Raw Result:', result); 
+  console.log('Parsed Data:', parsedData)
+  console.log("result: ", parsedData.result)
 
+  const router = useRouter();
+
+  const handleProceed = async () => {
+    try {
+      // Make a GET request to the Next.js API route
+      const response = await fetch("/api/viability", {
+        method: "GET",
+      });
+      const data = await response.json();
+      
+      if (response.ok) {
+        console.log("Data from Flask server:", data);
+        const encodedData = encodeURIComponent(JSON.stringify(data));
+        router.push(`/product_viability_agent?data=${encodedData}`);
+      } else {
+        console.error("Failed to fetch data:", data);
+      }
+    } catch (error) {
+      console.error("Error during the GET request:", error);
+    }
+  };
   
   return (
     <div style={{ padding: "1rem", color: "white", backgroundColor: "#222222", minHeight: "100vh", textAlign: "center" }}>
@@ -78,14 +100,20 @@ export default function DesignThinkingAgentOutput() {
         <div className="flex-container">
           <EmpathyMap empathyData={parsedData.result.empathy_map} />
           <CustomerJourney journeyData={parsedData.result.customer_journey_map} />
+          {/* use the below two lines if you want to use dummy data*/}
+          {/* <EmpathyMap empathyData={data.empathy_map} />
+          <CustomerJourney journeyData={data.customer_journey_map} /> */}
         </div>
 
         {/* Navigation Button */}
-        <Link href="/business_model_agent">
-          <button className="button mt-8" style={{ padding: "0.75rem 1.5rem", fontSize: "1rem", borderRadius: "0.25rem" }}>
-            Proceed to Business Model Agent
+        {/* <Link href="/business_model_agent"> */}
+          <button
+            className="button mt-8"
+            style={{ padding: "0.75rem 1.5rem", fontSize: "1rem", borderRadius: "0.25rem" }}
+            onClick={handleProceed}>
+            Proceed to Product Viability Agent
           </button>
-        </Link>
+        {/* </Link> */}
       </main>
     </div>
   );

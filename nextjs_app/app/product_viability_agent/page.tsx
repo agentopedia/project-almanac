@@ -1,8 +1,40 @@
 "use client"
 import { useState } from "react";
+import { useSearchParams } from 'next/navigation';
+
+type ProductData = {
+  introduction: string;
+  goals: string;
+  targetAudience: string;
+  productFeatures: string;
+  functionalRequirements: string;
+  nonfunctionalRequirements: string;
+};
+
+type ParsedData = {
+  data: ProductData;
+};
 
 const ProductViability = () => {
   const [activeSection, setActiveSection] = useState<string>("Introduction");
+
+  const searchParams = useSearchParams();
+  const data = searchParams.get('data'); 
+  
+  let parsedData;
+  if (data) {
+    try {
+      parsedData = JSON.parse(decodeURIComponent(data)); // Decode the URL-encoded string and parse it as JSON
+      if (parsedData.data) {
+        parsedData.data = JSON.parse(parsedData.data);
+      }
+    } catch (error) {
+      console.error('Json not formatted correctly:', error);
+    }
+  }
+
+  console.log("Raw Data: ", data);
+  console.log("Parsed Data: ", parsedData.data);
 
   const sections = [
     "Introduction",
@@ -90,7 +122,7 @@ const ProductViability = () => {
           >
             <h2 style={{ color: "#333" }}>{activeSection}</h2>
             <p style={{ color: "#666" }}>
-              This is the content for the {activeSection} section.
+              {parsedData?.data?.[activeSection.toLowerCase().replace(/ /g, "_")]?.join("\n") || "No data available"}
             </p>
           </div>
         </main>
