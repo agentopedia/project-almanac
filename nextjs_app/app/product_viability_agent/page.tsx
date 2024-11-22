@@ -119,7 +119,7 @@ const ProductViability = () => {
         <button onClick={() => router.push("../design_agent_output")}>
           Back to Design Thinking Agent
         </button>
-        <button onClick={() => router.push("../business_model_agent")}>
+        <button onClick={() => router.push("")}>
           Proceed to Business Model Agent
         </button>
       </div>

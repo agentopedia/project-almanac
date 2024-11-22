@@ -33,7 +33,6 @@ export default function DesignThinkingAgentInput() {
         <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>Product Ideation</h1>
         <p style={{ fontSize: "1.25rem", marginBottom: "2rem" }}>Begin your journey of MVP generation</p>
 
-        {/* Flex Container for Textarea and Button */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           <form onSubmit={handleSubmit}>
             {/* Input Field */}
@@ -41,15 +40,7 @@ export default function DesignThinkingAgentInput() {
               placeholder="Enter product description..."
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              style={{
-                width: "100%",
-                height: "200px",
-                padding: "1rem",
-                fontSize: "1.25rem",
-                borderRadius: "0.25rem",
-                border: "1px solid #ccc",
-                marginBottom: "1rem"
-              }}
+              className="textarea"
             />
 
             {/* Navigation Buttons */}
