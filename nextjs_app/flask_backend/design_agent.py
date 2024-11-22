@@ -7,7 +7,7 @@ import os
 class DesignThinkingAgent(Agent):
 
     #NEED TO HAVE THIS AS A SINGLE LINE
-    json_format = {"customer_persona":[{"name":"Persona 1","demographics":{"age":0,"gender":"","occupation":""},"description":"Brief background and lifestyle information."}],"empathy_map":{"says":["What the persona verbally expresses about the problem."],"thinks":["What the persona is thinking internally."],"does":["Actions the persona takes to address the problem."],"feels":["Emotions experienced by the persona."]},"customer_journey_map":{"awareness":"How the persona becomes aware of the product or problem.","comparison":"How the persona evaluates different options.","purchase":"Factors influencing the purchase decision.","installation":"Persona's experience with setting up or using the product."},"problem_statement":"A clear, concise statement that defines the issue the product is trying to solve."}
+    json_format = {"customer_persona":[{"name":"","demographics":{"age":0,"gender":"","occupation":""},"description":"Brief background and lifestyle information."}],"empathy_map":{"says":["What the persona verbally expresses about the problem."],"thinks":["What the persona is thinking internally."],"does":["Actions the persona takes to address the problem."],"feels":["Emotions experienced by the persona."]},"customer_journey_map":{"awareness":"How the persona becomes aware of the product or problem.","comparison":"How the persona evaluates different options.","purchase":"Factors influencing the purchase decision.","installation":"Persona's experience with setting up or using the product."},"problem_statement":"A clear, concise statement that defines the issue the product is trying to solve."}
 
     prompt = f""" You are a smart researcher who must utilize design thinking to generate customer personas, given a product description. 
     Use Tavilly to do research on the product description and use the information gained to create a customer persona that would benefit from the specified product. 
@@ -23,8 +23,13 @@ class DesignThinkingAgent(Agent):
     """
 
     def __init__(self, model, tools):
+        self.product_idea = ""
         super().__init__(model, tools, self.prompt)
 
+    def run(self, inputData):
+        self.product_idea = inputData
+        result = super().run(self, inputData)
+        return result
 # # example usage of this class
 # os.environ['GOOGLE_API_KEY'] = "AIzaSyCmUDbVAOGcRZcOKP4q6mmeZ7Gx1WgE3vE"
 # gemini_api_key = os.getenv("GOOGLE_API_KEY")

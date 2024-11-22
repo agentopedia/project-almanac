@@ -53,14 +53,22 @@ def get_viability_data():
 
 @app.route('/design_backtracking', methods=['GET'])
 def get_design_output():
-    print("in python design backtracking")
+    print("in design backtracking")
     result = design.last_message
-    response = """{}"""
+    response = ""
     if result == "":
         response = {"message": "Error, design agent has no last message data saved"}
     else:
         response = {"message": "Success", "result": result}
     print(response)
+    return jsonify(response), 200
+
+@app.route('/ideation_backtracking', methods=['GET'])
+def get_product_idea(): #can be any name you want, wont use this name again
+    print("in product ideation backtracking")
+    result = design.product_idea
+    print("product idea: " + result)
+    response = {"message": "Success", "result": result}
     return jsonify(response), 200
 
 if __name__ == '__main__':
