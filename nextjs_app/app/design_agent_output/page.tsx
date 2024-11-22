@@ -81,7 +81,7 @@ export default function DesignThinkingAgentOutput() {
       if (response.ok) {
         console.log("Data from Flask server:", data);
         const encodedData = encodeURIComponent(JSON.stringify(data));
-        router.push(`/product_viability_agent?data=${encodedData}&fromDesign=${result}`);
+        router.push(`/product_viability_agent?data=${encodedData}`);
       } else {
         console.error("Failed to fetch data:", data);
       }

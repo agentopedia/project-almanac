@@ -12,36 +12,36 @@ type ProductData = {
   nonfunctionalRequirements: string;
 };
 
-type DesignAgentData = {
-  customer_persona: Array<{
-    name: string;
-    demographics: { age: number; gender: string; occupation: string };
-    description: string;
-  }>;
-  empathy_map: {
-    says: string[];
-    thinks: string[];
-    does: string[];
-    feels: string[];
-  };
-  customer_journey_map: {
-    awareness: string;
-    comparison: string;
-    purchase: string;
-    installation: string;
-  };
-  problem_statement: string;
-};
+// type DesignAgentData = {
+//   customer_persona: Array<{
+//     name: string;
+//     demographics: { age: number; gender: string; occupation: string };
+//     description: string;
+//   }>;
+//   empathy_map: {
+//     says: string[];
+//     thinks: string[];
+//     does: string[];
+//     feels: string[];
+//   };
+//   customer_journey_map: {
+//     awareness: string;
+//     comparison: string;
+//     purchase: string;
+//     installation: string;
+//   };
+//   problem_statement: string;
+// };
 
 const ProductViability = () => {
   const [activeSection, setActiveSection] = useState<string>("Introduction");
   const [parsedProductData, setParsedProductData] = useState<ProductData | null>(null); // parsed product data
-  const [parsedFromDesign, setParsedFromDesign] = useState<DesignAgentData | null>(null); // parsed design data
+  // const [parsedFromDesign, setParsedFromDesign] = useState<DesignAgentData | null>(null); // parsed design data
   const [loadingTimeoutReached, setLoadingTimeoutReached] = useState<boolean>(false); // track timeout state
   const router = useRouter();
   const searchParams = useSearchParams();
   const data = searchParams.get("data");
-  const fromDesign = searchParams.get("fromDesign");
+  // const fromDesign = searchParams.get("fromDesign");
 
   // parse product viability data
   useEffect(() => {
@@ -62,16 +62,16 @@ const ProductViability = () => {
   }, [data]);
 
   // parse design agent data
-  useEffect(() => {
-    if (fromDesign) {
-      try {
-        const parsedData = JSON.parse(decodeURIComponent(fromDesign));
-        setParsedFromDesign(parsedData);
-      } catch (error) {
-        console.error("Error parsing fromDesign data:", error);
-      }
-    }
-  }, [fromDesign]);
+  // useEffect(() => {
+  //   if (fromDesign) {
+  //     try {
+  //       const parsedData = JSON.parse(decodeURIComponent(fromDesign));
+  //       setParsedFromDesign(parsedData);
+  //     } catch (error) {
+  //       console.error("Error parsing fromDesign data:", error);
+  //     }
+  //   }
+  // }, [fromDesign]);
 
   // timeout to change `loadingTimeoutReached` after 3 seconds
   useEffect(() => {
@@ -93,13 +93,31 @@ const ProductViability = () => {
     { key: "nonfunctionalRequirements", label: "Nonfunctional Requirements" },
   ];
 
-  const handleBackToDesign = () => {
-    if (parsedFromDesign) {
-      const encodedData = encodeURIComponent(JSON.stringify(parsedFromDesign));
-      router.push(`/design_agent_output?result=${encodedData}`);
-    } else {
-      console.error("No design data available to navigate back.");
+  const handleBackToDesign = async () => {
+    // if (parsedFromDesign) {
+    //   const encodedData = encodeURIComponent(JSON.stringify(parsedFromDesign));
+    //   router.push(`/design_agent_output?result=${encodedData}`);
+    // } else {
+    //   console.error("No design data available to navigate back.");
+    // }
+    try {
+      // Make a GET request to the Next.js API route
+      const response = await fetch("/api/design_backtracking", {
+        method: "GET",
+      });
+      const result = await response.json();
+      
+      if (response.ok) {
+        console.log("Result from Flask server:", result);
+        const encodedResult = encodeURIComponent(JSON.stringify(result));
+        router.push(`/design_agent_output?result=${encodedResult}`);
+      } else {
+        console.error("Failed to fetch result:", result);
+      }
+    } catch (error) {
+      console.error("Error during the GET request:", error);
     }
+
   };
 
   const getSectionData = (key: string): string => {
