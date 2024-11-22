@@ -4,7 +4,6 @@ import EmpathyMap from '../components/EmpathyMap';
 import CustomerJourney from '../components/CustomerJourney';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-import { resourceUsage } from 'process';
 
 // TODO this is just sample data so that you can test out the UI design without using an API call
 const data = {
@@ -53,11 +52,11 @@ const data = {
 export default function DesignThinkingAgentOutput() {
   //if you want to use dummy data, comment out everything above const router = useRouter();
   const searchParams = useSearchParams();
-  const result = searchParams.get('result'); // Get 'result' query parameter from URL
+  const result = searchParams.get('result'); // get 'result' query parameter from URL
   let parsedData;
   if (result) {
     try {
-      parsedData = JSON.parse(decodeURIComponent(result)); // Decode the URL-encoded string and parse it as JSON
+      parsedData = JSON.parse(decodeURIComponent(result)); // decode the URL-encoded string and parse it as JSON
       if (parsedData.result) {
         parsedData.result = JSON.parse(parsedData.result);
       }
@@ -73,7 +72,7 @@ export default function DesignThinkingAgentOutput() {
 
   const handleProceed = async () => {
     try {
-      // Make a GET request to the Next.js API route
+      // make a GET request to the Next.js API route
       const response = await fetch("/api/viability", {
         method: "GET",
       });
@@ -92,25 +91,96 @@ export default function DesignThinkingAgentOutput() {
   };  
   
   return (
-    <div style={{ padding: "1rem", color: "white", backgroundColor: "#222222", minHeight: "100vh", textAlign: "center" }}>
-      <main style={{ marginTop: "2rem" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        color: "white",
+        textAlign: "center",
+      }}
+    >
+      <main style={{ width: "80%" }}>
         <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>Design Thinking Agent</h1>
 
-        {/* Flex container for side-by-side layout */}
-        <div className="flex-container">
-          <EmpathyMap empathyData={parsedData.result.empathy_map} />
-          <CustomerJourney journeyData={parsedData.result.customer_journey_map} />
-          {/* use the below two lines if you want to use dummy data*/}
-          {/* <EmpathyMap empathyData={data.empathy_map} />
-          <CustomerJourney journeyData={data.customer_journey_map} /> */}
+        {/* Customer Persona Section */}
+        <div
+          style={{
+            marginBottom: "2rem",
+            padding: "1rem",
+            borderRadius: "8px",
+            backgroundColor: "var(--primary-color)",
+            color: "white",
+            textAlign: "left",
+          }}
+        >
+          <h2 style={{fontSize: "1.75rem", textAlign: "center" }}>
+            Customer Persona
+          </h2>
+          <p>
+            <span style={{ fontWeight: "bold", color: "white" }}>Name:</span>{" "}
+            {parsedData?.result?.customer_persona[0].name || "N/A"}
+          </p>
+          <p>
+            <span style={{ fontWeight: "bold", color: "white" }}>Demographics:</span>{" "}
+            {`Age: ${parsedData?.result?.customer_persona[0].demographics.age || "N/A"}, `}
+            {`Gender: ${parsedData?.result?.customer_persona[0].demographics.gender || "N/A"}, `}
+            {`Occupation: ${parsedData?.result?.customer_persona[0].demographics.occupation || "N/A"}`}
+          </p>
+          <p>
+            <span style={{ fontWeight: "bold", color: "white" }}>Description:</span>{" "}
+            {parsedData?.result?.customer_persona[0].description || "N/A"}
+          </p>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between", // space btwn the components
+            gap: "1rem"
+          }}
+        >
+          {/* Empathy Map */}
+          <EmpathyMap empathyData={parsedData?.result?.empathy_map || {}} />
+
+          {/* Customer Journey Map */}
+          <CustomerJourney journeyData={parsedData?.result?.customer_journey_map || {}} />
         </div>
 
         {/* Navigation Buttons */}
-        <div className="navigation-buttons">
-          <button onClick={() => router.push("/design_agent_input")}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: "2rem",
+          }}
+        >
+          <button
+            onClick={() => router.push("/design_agent_input")}
+            style={{
+              padding: "0.5rem 1rem",
+              backgroundColor: "var(--primary-color)",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
             Back to Product Ideation
           </button>
-          <button onClick={handleProceed}>
+          <button
+            onClick={handleProceed}
+            style={{
+              padding: "0.5rem 1rem",
+              backgroundColor: "var(--primary-color)",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
             Proceed to Product Viability Agent
           </button>
         </div>
