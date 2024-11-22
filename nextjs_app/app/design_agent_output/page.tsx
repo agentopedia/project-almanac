@@ -78,18 +78,18 @@ export default function DesignThinkingAgentOutput() {
         method: "GET",
       });
       const data = await response.json();
-      
+  
       if (response.ok) {
         console.log("Data from Flask server:", data);
         const encodedData = encodeURIComponent(JSON.stringify(data));
-        router.push(`/product_viability_agent?data=${encodedData}`);
+        router.push(`/product_viability_agent?data=${encodedData}&fromDesign=${result}`);
       } else {
         console.error("Failed to fetch data:", data);
       }
     } catch (error) {
       console.error("Error during the GET request:", error);
     }
-  };
+  };  
   
   return (
     <div style={{ padding: "1rem", color: "white", backgroundColor: "#222222", minHeight: "100vh", textAlign: "center" }}>

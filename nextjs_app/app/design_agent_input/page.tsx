@@ -48,7 +48,18 @@ export default function DesignThinkingAgentInput() {
               <button onClick={() => router.push("/")}>
                 Back to Home
               </button>
-              <button onClick={handleSubmit}>
+              <button
+                type="submit"
+                disabled={!inputText.trim()} // disable button if inputText is empty/whitespace
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: inputText.trim() ? "#007bff" : "#aaa", // button color based on state
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: inputText.trim() ? "pointer" : "not-allowed", // cursor style
+                }}
+              >
                 Submit
               </button>
             </div>

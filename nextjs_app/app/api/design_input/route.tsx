@@ -2,6 +2,8 @@
 // import type { NextRequest, NextResponse } from 'next';
 import {NextRequest, NextResponse } from 'next/server';
 
+let lastMessage = null; // in-memory storage
+
 export async function POST(req: NextRequest, res: NextResponse) {
   if (req.method == 'POST') {
     const {query} = await req.json();
@@ -13,6 +15,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     const data = await flaskResponse.json();
+    lastMessage = data.result; // store last message in memory
     return NextResponse.json({ message: 'Form submitted successfully', result: data.result }, { status: 200 });
   } 
 }

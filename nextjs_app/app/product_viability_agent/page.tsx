@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 
@@ -12,27 +12,77 @@ type ProductData = {
   nonfunctionalRequirements: string;
 };
 
-type ParsedData = {
-  data: ProductData;
+type DesignAgentData = {
+  customer_persona: Array<{
+    name: string;
+    demographics: { age: number; gender: string; occupation: string };
+    description: string;
+  }>;
+  empathy_map: {
+    says: string[];
+    thinks: string[];
+    does: string[];
+    feels: string[];
+  };
+  customer_journey_map: {
+    awareness: string;
+    comparison: string;
+    purchase: string;
+    installation: string;
+  };
+  problem_statement: string;
 };
 
 const ProductViability = () => {
   const [activeSection, setActiveSection] = useState<string>("Introduction");
-  const router = useRouter(); // navigating btwn agents
+  const [parsedProductData, setParsedProductData] = useState<ProductData | null>(null); // parsed product data
+  const [parsedFromDesign, setParsedFromDesign] = useState<DesignAgentData | null>(null); // parsed design data
+  const [loadingTimeoutReached, setLoadingTimeoutReached] = useState<boolean>(false); // track timeout state
+  const router = useRouter();
   const searchParams = useSearchParams();
   const data = searchParams.get("data");
+  const fromDesign = searchParams.get("fromDesign");
 
-  let parsedData;
-  if (data) {
-    try {
-      parsedData = JSON.parse(decodeURIComponent(data));
-      if (parsedData.data) {
-        parsedData.data = JSON.parse(parsedData.data);
+  // parse product viability data
+  useEffect(() => {
+    if (data) {
+      try {
+        const parsedData = JSON.parse(decodeURIComponent(data));
+
+        const productData =
+          typeof parsedData.data === "string"
+            ? JSON.parse(parsedData.data)
+            : parsedData.data;
+
+        setParsedProductData(productData);
+      } catch (error) {
+        console.error("Error parsing data:", error);
       }
-    } catch (error) {
-      console.error("JSON not formatted correctly:", error);
     }
-  }
+  }, [data]);
+
+  // parse design agent data
+  useEffect(() => {
+    if (fromDesign) {
+      try {
+        const parsedData = JSON.parse(decodeURIComponent(fromDesign));
+        setParsedFromDesign(parsedData);
+      } catch (error) {
+        console.error("Error parsing fromDesign data:", error);
+      }
+    }
+  }, [fromDesign]);
+
+  // timeout to change `loadingTimeoutReached` after 3 seconds
+  useEffect(() => {
+    if (!parsedProductData) {
+      const timeout = setTimeout(() => {
+        setLoadingTimeoutReached(true);
+      }, 3000); // 3 seconds
+
+      return () => clearTimeout(timeout); // clear timeout if parsedProductData is loaded
+    }
+  }, [parsedProductData]);
 
   const sections = [
     { key: "introduction", label: "Introduction" },
@@ -42,6 +92,23 @@ const ProductViability = () => {
     { key: "functionalRequirements", label: "Functional Requirements" },
     { key: "nonfunctionalRequirements", label: "Nonfunctional Requirements" },
   ];
+
+  const handleBackToDesign = () => {
+    if (parsedFromDesign) {
+      const encodedData = encodeURIComponent(JSON.stringify(parsedFromDesign));
+      router.push(`/design_agent_output?result=${encodedData}`);
+    } else {
+      console.error("No design data available to navigate back.");
+    }
+  };
+
+  const getSectionData = (key: string): string => {
+    const validKey = key as keyof ProductData;
+    if (!parsedProductData) {
+      return loadingTimeoutReached ? "No data available" : "Loading...";
+    }
+    return parsedProductData[validKey] || "No data available";
+  };
 
   return (
     <div style={{ padding: "20px", minHeight: "100vh", backgroundColor: "#222" }}>
@@ -76,8 +143,7 @@ const ProductViability = () => {
         <div className="product-section" style={{ flex: 1 }}>
           <h2>{activeSection}</h2>
           <p>
-            {parsedData?.data?.[activeSection.toLowerCase().replace(/ /g, "_")] ||
-              "No data available"}
+            {getSectionData(activeSection.toLowerCase().replace(/ /g, "_"))}
           </p>
 
           {/* Footer Buttons */}
@@ -116,7 +182,7 @@ const ProductViability = () => {
 
       {/* Navigation Buttons */}
       <div className="navigation-buttons">
-        <button onClick={() => router.push("../design_agent_output")}>
+        <button onClick={handleBackToDesign}>
           Back to Design Thinking Agent
         </button>
         <button onClick={() => router.push("")}>
