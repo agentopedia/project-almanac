@@ -18,7 +18,7 @@ class DesignThinkingAgent(Agent):
     2. Create an empathy map for this user - what does the user say, think, do , and feel?
     3. Create a customer journey map for this user that consists of awareness, comparison, purchase, and installation.
     4. Create a clear problem statement for the described product.
-    Give output in the following JSON format on one line, making sure to use double quotes:
+    Give output in the following JSON format on one line, making sure to use double quotes and making sure to fill out all parts of the JSON:
     {json_format}
     """
 
