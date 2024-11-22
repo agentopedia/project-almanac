@@ -34,7 +34,7 @@ export default function DesignThinkingAgentInput() {
         <p style={{ fontSize: "1.25rem", marginBottom: "2rem" }}>Begin your journey of MVP generation</p>
 
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <form onSubmit={handleSubmit}>
+          <form>
             {/* Input Field */}
             <textarea
               placeholder="Enter product description..."
@@ -48,7 +48,7 @@ export default function DesignThinkingAgentInput() {
               <button onClick={() => router.push("/")}>
                 Back to Home
               </button>
-              <button
+              <button onClick={handleSubmit}
                 type="submit"
                 disabled={!inputText.trim()} // disable button if inputText is empty/whitespace
                 style={{

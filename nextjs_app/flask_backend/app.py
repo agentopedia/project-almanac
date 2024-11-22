@@ -51,6 +51,17 @@ def get_viability_data():
     response = {"message": "Success", "data": result}
     return jsonify(response), 200
 
+@app.route('/design_backtracking', methods=['GET'])
+def get_design_output():
+    print("in python design backtracking")
+    result = design.last_message
+    response = """{}"""
+    if result == "":
+        response = {"message": "Error, design agent has no last message data saved"}
+    else:
+        response = {"message": "Success", "result": result}
+    print(response)
+    return jsonify(response), 200
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
