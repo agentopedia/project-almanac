@@ -2,15 +2,15 @@
 :root {
   --primary-color: #0056b3;
   --secondary-color: #00aaff;
-  --background-color: #f8f9fa;
+  --background-color: #222222;
   --surface-color: #ffffff;
-  --text-color-primary: #333333;
-  --text-color-secondary: #666666;
+  --text-color-primary: #ffffff;
+  --text-color-secondary: #cccccc;
   --border-color: #dddddd;
   --button-hover-color: #004094;
 }
 
-/* Reset & Base Styles */
+/* Base Styles */
 *,
 *::before,
 *::after {
@@ -21,7 +21,7 @@
 }
 
 html, body {
-  background-color: #222;
+  background-color: var(--background-color);
   color: white;
   margin: 0;
   padding: 0;
@@ -36,7 +36,7 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #222
+  background-color: var(--background-color);
 }
 
 h1, p {
@@ -45,7 +45,7 @@ h1, p {
 
 a {
   color: var(--primary-color);
-  text-decoration: none;
+  text-decoration: underline;
   transition: color 0.3s ease;
 }
 
@@ -188,35 +188,7 @@ button:hover, .button:hover {
   text-align: center;
 }
 
-/* Media Queries for Responsiveness */
-@media (max-width: 768px) {
-  .container {
-    padding: 10px;
-  }
-
-  h1 {
-    font-size: 2rem;
-  }
-
-  h2 {
-    font-size: 1.75rem;
-  }
-
-  .navbar a {
-    margin-right: 1rem;
-  }
-
-  .flex-container {
-    flex-direction: column;
-  }
-
-  .empathy-map-container,
-  .journey-map-container {
-    width: 100%;
-  }
-}
-
-/* EmpathyMap & CustomerJourney Styles for Side-by-Side Layout */
+/* Empathy Map & Customer Journey Map Styles */
 .empathy-map-container,
 .journey-map-container {
   width: 100%;
@@ -225,6 +197,14 @@ button:hover, .button:hover {
   border-radius: 8px;
   background-color: var(--primary-color);
   color: white;
+}
+
+.empathy-map-section h4,
+.journey-map-section h4 {
+  color: var(--background-color);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
 }
 
 .empathy-map-heading,
@@ -251,7 +231,7 @@ button:hover, .button:hover {
   border-radius: 8px;
   padding: 10px;
   background-color: var(--surface-color);
-  color: var(--text-color-primary);
+  color: var(--text-color-secondary);
 }
 
 .empathy-map-box,
@@ -270,4 +250,108 @@ button:hover, .button:hover {
   justify-content: space-between;
   align-items: flex-start;
   gap: 20px;
+}
+
+/* Sidebar Styling */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 180px;
+  margin-right: 20px;
+}
+
+.sidebar button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.sidebar button.active {
+  background-color: var(--button-hover-color);
+}
+
+.sidebar button:hover {
+  transform: scale(1.05);
+}
+
+/* Product Section Styles */
+.product-section {
+  flex: 1;
+  margin: 10px;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: var(--primary-color);
+  color: white;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product-section h2 {
+  color: var(--surface-color);
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.product-section p {
+  background-color: var(--secondary-color);
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Footer Buttons */
+.footer-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.footer-buttons button {
+  background-color: var(--surface-color);
+  color: var(--primary-color);
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: 1px solid var(--primary-color);
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.footer-buttons button:hover {
+  background-color: var(--primary-color);
+  color: var(--surface-color);
+  transform: scale(1.05);
+}
+
+/* Navigation Buttons (btwn agents) */
+.navigation-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.navigation-buttons button {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.navigation-buttons button:hover {
+  background-color: var(--button-hover-color);
+  transform: scale(1.05);
 }

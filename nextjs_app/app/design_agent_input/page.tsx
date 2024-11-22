@@ -52,10 +52,15 @@ export default function DesignThinkingAgentInput() {
               }}
             />
 
-            {/* Submit Button */}
-              <button className="button mt-8" style={{ padding: "0.75rem 1.5rem", fontSize: "1rem", borderRadius: "0.25rem" }}>
+            {/* Navigation Buttons */}
+            <div className="navigation-buttons">
+              <button onClick={() => router.push("/")}>
+                Back to Home
+              </button>
+              <button onClick={handleSubmit}>
                 Submit
               </button>
+            </div>
           </form>
         </div>
         {response && (

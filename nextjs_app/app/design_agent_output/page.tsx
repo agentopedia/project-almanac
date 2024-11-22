@@ -105,15 +105,15 @@ export default function DesignThinkingAgentOutput() {
           <CustomerJourney journeyData={data.customer_journey_map} /> */}
         </div>
 
-        {/* Navigation Button */}
-        {/* <Link href="/business_model_agent"> */}
-          <button
-            className="button mt-8"
-            style={{ padding: "0.75rem 1.5rem", fontSize: "1rem", borderRadius: "0.25rem" }}
-            onClick={handleProceed}>
+        {/* Navigation Buttons */}
+        <div className="navigation-buttons">
+          <button onClick={() => router.push("/design_agent_input")}>
+            Back to Product Ideation
+          </button>
+          <button onClick={handleProceed}>
             Proceed to Product Viability Agent
           </button>
-        {/* </Link> */}
+        </div>
       </main>
     </div>
   );
