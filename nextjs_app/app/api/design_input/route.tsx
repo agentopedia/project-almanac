@@ -4,7 +4,7 @@ import {NextRequest, NextResponse } from 'next/server';
 
 let lastMessage = null; // in-memory storage
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   if (req.method == 'POST') {
     const {query} = await req.json();
     // console.log(query);

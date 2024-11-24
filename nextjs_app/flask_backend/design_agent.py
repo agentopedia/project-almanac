@@ -28,7 +28,7 @@ class DesignThinkingAgent(Agent):
 
     def run(self, inputData):
         self.product_idea = inputData
-        result = super().run(self, inputData)
+        result = super().run(inputData)
         return result
 # # example usage of this class
 # os.environ['GOOGLE_API_KEY'] = "AIzaSyCmUDbVAOGcRZcOKP4q6mmeZ7Gx1WgE3vE"

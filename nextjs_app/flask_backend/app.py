@@ -52,7 +52,7 @@ def get_viability_data():
     return jsonify(response), 200
 
 @app.route('/design_backtracking', methods=['GET'])
-def get_design_output():
+def get_design_output(): #can be any name you want, wont use this name again
     print("in design backtracking")
     result = design.last_message
     response = ""
@@ -64,7 +64,7 @@ def get_design_output():
     return jsonify(response), 200
 
 @app.route('/ideation_backtracking', methods=['GET'])
-def get_product_idea(): #can be any name you want, wont use this name again
+def get_product_idea(): 
     print("in product ideation backtracking")
     result = design.product_idea
     print("product idea: " + result)
