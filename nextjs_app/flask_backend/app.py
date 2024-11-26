@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
 from design_agent import DesignThinkingAgent
 from viability_agent import ProductViabilityAgent
+from swe_agent import SWESystemAgent
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.tools.tavily_search import TavilySearchResults
 import json
 import os
+import socket
 
 os.environ['GOOGLE_API_KEY'] = "AIzaSyCmUDbVAOGcRZcOKP4q6mmeZ7Gx1WgE3vE"
 gemini_api_key = os.getenv("GOOGLE_API_KEY")
@@ -18,12 +20,14 @@ tools = [TavilySearchResults(max_results = 1, api_key = tavily_api_key)]
 app = Flask(__name__)
 design = DesignThinkingAgent(model, tools)
 viability = ProductViabilityAgent(model, tools)
+swe = SWESystemAgent(model, tools)
 
 @app.route('/design_input', methods=['POST'])
 def run_agent():
     #resetting all the agents' last message
     design.last_message = ""
     viability.last_message = ""
+    # swe.last_message = ""
     data = request.json
     query = data['query']
     print("query: " + query)
@@ -31,6 +35,18 @@ def run_agent():
     result = design.cleanJsonContent(result['messages'][-1].content) #getting the last message and formatting that output
     print(result)
     response = {"message": "Query received", "result": result}
+    return jsonify(response), 200
+
+@app.route('/swe', methods=['GET'])
+def get_swe_data():
+    data = json.loads(viability.last_message)
+    if (swe.last_message == ""):
+        result = swe.run(data)
+        result = swe.cleanJsonContent(result['messages'][-1].content)
+    else:
+        result = swe.last_message
+    print(result)
+    response = {"message": "Success", "data": result}
     return jsonify(response), 200
 
 @app.route('/viability', methods=['GET'])
@@ -71,5 +87,10 @@ def get_product_idea():
     response = {"message": "Success", "result": result}
     return jsonify(response), 200
 
+def findFreePort():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('', 0))
+        return s.getsockname()[1]
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+  app.run(host='0.0.0.0', port = findFreePort())

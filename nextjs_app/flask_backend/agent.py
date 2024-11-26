@@ -57,3 +57,8 @@ class Agent:
         # Remove the Markdown code block delimiters (```json and ```
         content = content.strip().strip("`").replace("json", "").strip().replace("\n", "").replace("  ", "") 
         return content
+    
+    def cleanHtmlContent(self, content):
+        # Remove the Markdown code block delimiters (```html and ```
+        content = content.strip().strip("`").replace("html", "").strip().replace("\n", "").replace("  ", "") 
+        return content
