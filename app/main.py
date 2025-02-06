@@ -418,251 +418,51 @@ def prd():
          print (content_final)
     return render_template('prd.html',prd=content_final)
 
-@app.route('/mvp', methods=['GET', 'POST'])
-def mvp():
+@app.route('/mvp/<mvp_name>', methods=['GET', 'POST'])
+def mvp(mvp_name):
+    record = get_record("almanac", mvp_name)
+    print ("record", record)
+    if record:
+        
+        print ("Inside the if block")
+        print (record)
+        description = record.get("description")
+        url = record.get("url")
+        session['url'] = url
+        session['description'] = description
+        content_final = record.get("html_content")
+        session['html_code'] = content_final
+        session['name'] = mvp_name
+        session['mvp_url'] = "https://pmagents.replit.app/mvp/"+mvp_name
+    else:
+        
+        
+        description = session['description']
+        prd_content = request.form.get('prd_content')                       
+        content = model_response(f'''Imagine you are a front-end engineer expert in bootstrap. Generate bootstrap html code based on the requirements outlined in the prd:{prd_content}. Ensure that all the user journeys outlined in the prd are supported by the app. 
 
-    if request.method == 'POST':
-         prd_content = request.form.get('prd_content')
-         print ("PRD content",prd_content)
-         content = model_response(f'''Imagine you are a front-end engineer expert in bootstrap. Generate bootstrap html code based on the requirements outlined in the prd:{prd_content}. 
-
-The multi-page web application should include all the different CUJs that are possible.  The primary objective is to make sure that clicking any button on the home page as part of the CUJ redirects the user to the /model endpoint. You also need to generate hidden input elements with the name 'button_name' in every form to capture the names of the buttons in the form. These names will also be sent to the /model end point when the user clicks on the buttons.
-Constraints:
-1.Do not generate a description of the code
-2.Do not generate html codeticks
-3.Ensure that all the buttons in the page are making a call to the route named '/model'. Clicking on this button should pass the arguments as input to the route. 
-4.Do not add javascript code to handle form submission to the /model end point. It should be handled directly by the generated html form element, so that request comes directly to the Flask route without involvement from Javascript. 
-5.Do not output the plan or the PRD
-6.Ensure that the html page provides a gateway to multiple pathways that users can explore. The landing page should open up a great deal of possibilities that the users can explore - their user experience should be enhanced by the use of the html page. Design the HTML landing page to function as a central hub, where users can easily navigate to different sections such as tutorials, product features, and support resources. The page should offer clear pathways with intuitive design elements, encouraging users to explore various options, thereby enhancing their overall experience 
-7.Never use placeholder texts as examples. Always approximate the real-world scenarios as examples based on the context of the webpage.
-8. Do not generate images. If needed generate ascii art that approximate the images
-
-Let's assume the description is for a contact form with fields for name, email, and message, along with a submit button that makes a call to the /model route. Here is the code:
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Form</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container">
-        <h2 class="mt-5">Contact Us</h2>
-        <form action="/model" method="POST" id="contactForm">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
-            </div>
-            <div class="form-group">
-                <label for="message">Message</label>
-                <textarea class="form-control" id="message" name="message" rows="4" placeholder="Enter your message" required></textarea>
-            </div>
-            <input type="hidden" name="button_name" value="Submit Feedback">
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
-Explanation:
-HTML Structure: The HTML document starts with the <!DOCTYPE html> declaration and includes the necessary metadata, such as the character set and viewport settings.
-Bootstrap Integration: Bootstrap CSS and JS are integrated using the CDN links.
-Form Structure: The form contains three input fields for name, email, and message. Each field is wrapped in a div with the class form-group to apply Bootstrap styling.
-Submit Button: The submit button is created with the class btn btn-primary to apply Bootstrap button styling. The form tag has an action attribute set to /model, and the method is set to POST. It will also send the hidden input field that contains the button name.
-JavaScript Integration: Bootstrap's JavaScript dependencies are included at the end of the body for better page load performance.
-Example for LLM to generate similar code:
-To ensure the LLM generates the correct code for buttons, here are a few additional examples with different form fields and buttons making calls to the /model route.
-
-Do not generate login form code.
-
-Example 3: Feedback Form
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback Form</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container">
-        <h2 class="mt-5">Feedback</h2>
-        <form action="/model" method="POST" id="feedbackForm">
-            <div class="form-group">
-                <label for="fullname">Full Name</label>
-                <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Enter your full name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
-            </div>
-            <div class="form-group">
-                <label for="feedback">Feedback</label>
-                <textarea class="form-control" id="feedback" name="feedback" rows="4" placeholder="Enter your feedback" required></textarea>
-            </div>
-            <input type="hidden" name="button_name" value="Submit Feedback">
-            <button type="submit" class="btn btn-primary">Submit Feedback</button>
-        </form>
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
-Example 4: Survey Form
-html
-Copy code
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Survey Form</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container">
-        <h2 class="mt-5">Survey</h2>
-        <form action="/model" method="POST" id="surveyForm">
-            <div class="form-group">
-                <label for="age">Age</label>
-                <input type="number" class="form-control" id="age" name="age" placeholder="Enter your age" required>
-            </div>
-            <div class="form-group">
-                <label for="gender">Gender</label>
-                <select class="form-control" id="gender" name="gender" required>
-                    <option value="">Select your gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="rating">Rate our service</label>
-                <select class="form-control" id="rating" name="rating" required>
-                    <option value="">Select rating</option>
-                    <option value="1">1 - Poor</option>
-                    <option value="2">2 - Fair</option>
-                    <option value="3">3 - Good</option>
-                    <option value="4">4 - Very Good</option>
-                    <option value="5">5 - Excellent</option>
-                </select>
-            </div>
-            <input type="hidden" name="button_name" value="Submit Survey">
-            <button type="submit" class="btn btn-primary">Submit Survey</button>
-        </form>
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
-Example 5: Appointment Booking Form
-html
-Copy code
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Appointment Booking</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container">
-        <h2 class="mt-5">Book an Appointment</h2>
-        <form action="/model" method="POST" id="appointmentForm">
-            <div class="form-group">
-                <label for="fullname">Full Name</label>
-                <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Enter your full name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
-            </div>
-            <div class="form-group">
-                <label for="date">Preferred Date</label>
-                <input type="date" class="form-control" id="date" name="date" required>
-            </div>
-            <div class="form-group">
-                <label for="time">Preferred Time</label>
-                <input type="time" class="form-control" id="time" name="time" required>
-            </div>
-            <input type="hidden" name="button_name" value="Book Appointment">
-            <button type="submit" class="btn btn-primary">Book Appointment</button>
-        </form>
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
-
-These examples cover various types of forms, each designed to capture different types of user input and make POST requests to the /model route. This should provide a clear template for generating similar Bootstrap forms for other use cases.
-
-Augment the final generated html code with the below guidelines:
-
-Here are the instructions for generating the html code:
-
-Design a dynamic, responsive web application using Bootstrap that incorporates a variety of layouts, components, and design patterns available in the framework. Do not use the default blue color to render the buttons. Use different colors based on the theme of the application that is getting built. This application should:
-
-Diverse Layouts:
-
-Utilize grid systems in creative ways, combining both flexbox and CSS grid for intricate layout control.
-Include multi-column layouts, nested grids, and equal-height cards to display content in unique and visually appealing ways.
-Implement sticky footers, off-canvas sidebars, and hero sections with background images.
-Navigation and Header Variations:
-
-Use multi-tiered navbars, dropdown menus, and scrollspy to create rich, interactive navigation systems.
-Experiment with transparent navbars, fixed headers, and different alignment options for navigation links.
-Color and Theme Diversity:
-
-Leverage the entire color palette in Bootstrap, creating custom themes using Sass variables, instead of sticking to default colors.
-Apply gradient backgrounds, shadows, and hover effects to add visual interest to buttons and other elements.
-Introduce dark mode support for the application using Bootstrap’s built-in utilities.
-Interactive Components:
-
-Use components like modals, carousels, tooltips, and popovers to create a highly interactive and user-friendly interface.
-Implement accordion menus, tabs, and pills navigation for structuring content effectively in different sections.
-Add toast notifications, alerts, and badges to improve feedback and user interaction.
-Forms and Input Variations:
-
-Build a robust form system with different input styles, including input groups, floating labels, and custom select dropdowns.
-Include advanced components like form validation, progress bars, range sliders, and file inputs.
-Utilize custom checkboxes, radio buttons, and toggle switches for better accessibility and user experience.
-Typography and Media:
-
-Apply Bootstrap’s typography utilities, including display headings, text alignment, and font size adjustments for dynamic and engaging text content.
-Use media objects to display content like profile pictures, user comments, and multimedia posts.
-Incorporate responsive images and embed videos to make the application more media-rich.
-Custom Utilities:
-
-Utilize spacing, border, and visibility utilities to ensure consistent design across devices and resolutions.
-Create custom animations, transitions, and hover effects using CSS utility classes for enhancing UI interactions.
-Make sure to deliver a highly modular code structure, keeping components reusable and easy to maintain. The application should be optimized for both desktop and mobile devices, taking advantage of Bootstrap’s built-in responsive design capabilities.
-
-
-
-
-        ''')
-         content_final = remove_html_and_backticks(content)
-         session['html_code'] = content_final
-         #add_record()
-         print (content_final)
-         #session['memory'] = memory_add(content_final)
+        The multi-page web application should include all the different CUJs that are possible.  The primary objective is to make sure that clicking any button on the home page as part of the CUJ redirects the user to the /model endpoint. You also need to generate hidden input elements with the name 'button_name' in every form to capture the names of the buttons in the form. These names will also be sent to the /model end point when the user clicks on the buttons.
+        Constraints:
+        1.Do not generate a description of the code
+        2.Do not generate html codeticks
+        3.Ensure that all the buttons in the page are making a call to the route named '/model'. Clicking on this button should pass the arguments as input to the route. 
+        4.Do not add javascript code to handle form submission to the /model end point. It should be handled directly by the generated html form element, so that request comes directly to the Flask route without involvement from Javascript. 
+        5.Do not output the plan or the PRD
+        6. Use icons from placeco, font awesome and bootstrap icons to make the page visually interesting. 
+        7.Ensure that the html page provides a gateway to multiple pathways that users can explore. The landing page should open up a great deal of possibilities that the users can explore - their user experience should be enhanced by the use of the html page. Design the HTML landing page to function as a central hub, where users can easily navigate to different sections such as tutorials, product features, and support resources. The page should offer clear pathways with intuitive design elements, encouraging users to explore various options, thereby enhancing their overall experience 
+        8.Never use placeholder texts as examples. Always approximate the real-world scenarios as examples based on the context of the webpage.
+        9. Do not generate images
+        10.You can include URLs that link to Google search results URLs for relevant content. For all other buttons on the page, they should redirect to the /model endpoint. 
+        11.Do have interactive UI elements that can be used to capture user input. For example, you can include a text input field, a dropdown menu, a radio button group, or a checkbox group. These elements can be used to capture user input that will be used in the payload sent to /model end point.
+        12.Keep in mind that the app is not connected to a backend database. If data retrieval is required, use the Google search tool to gather the necessary information.
+        13.Do not create payments pages, pricing pages and other pages that require user authentication.
+                ''')
+        content_final = remove_html_and_backticks(content)
+        session['html_code'] = content_final
+        session['name'] = mvp_name
+        session['mvp_url'] = "https://pmagents.replit.app/mvp/"+mvp_name
+        add_record("almanac",mvp_name,description, session['url'],content_final)
+       # session['memory'] = memory_add(content_final)
     return render_template('mvp.html',mvp_content=content_final)
 
 
