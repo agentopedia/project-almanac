@@ -4,11 +4,12 @@ from viability_agent import ProductViabilityAgent
 from swe_agent import SWESystemAgent
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.tools.tavily_search import TavilySearchResults
+import json5
 import json
 import os
 import socket
 
-os.environ['GOOGLE_API_KEY'] = "AIzaSyCmUDbVAOGcRZcOKP4q6mmeZ7Gx1WgE3vE"
+os.environ['GOOGLE_API_KEY'] = "AIzaSyCcN7Yo1ONOFYn5wCzPcBxTXfk7wyUFlko"
 gemini_api_key = os.getenv("GOOGLE_API_KEY")
 
 os.environ['TAVILY_API_KEY'] = "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" #set tavily api key here
@@ -39,7 +40,7 @@ def run_agent():
 
 @app.route('/swe', methods=['GET'])
 def get_swe_data():
-    data = json.loads(viability.last_message)
+    data = json5.loads(viability.last_message)
     if (swe.last_message == ""):
         result = swe.run(data)
         result = swe.cleanJsonContent(result['messages'][-1].content)
@@ -53,7 +54,7 @@ def get_swe_data():
 def get_viability_data():
     #just for testing purposes
     # design.last_message = """{"customer_persona":[{"name":"Professor Annelise","demographics":{"age":45,"gender":"Female","occupation":"Biology Professor"},"description":"Annelise is a dedicated biology professor with a passion for herpetology, seeking engaging and reliable resources for her classes and research, valuing accuracy, up-to-date information, and user-friendly interfaces."}],"empathy_map":{"says":["I need a reliable source of information on frog species.","My students need engaging learning materials.","It's difficult to find all the information I need in one place."],"thinks":["This web app could save me a lot of time.","I hope the information is accurate and up-to-date.","Will this app be engaging enough for my students?"],"does":["Searches online for frog information.","Looks through textbooks and journals.","Prepares lectures and assignments using various resources."],"feels":["Frustrated by the lack of a comprehensive resource.","Overwhelmed by the amount of information to sift through.","Excited about the potential of a user-friendly web app."]},"customer_journey_map":{"awareness":"Annelise hears about the web app from a colleague at a conference.","comparison":"She compares the web app to other online resources, checking for accuracy, comprehensiveness, and user-friendliness.","purchase":"She decides to use the web app for its comprehensive information and engaging features, free of charge.","installation":"She easily accesses the web app through her browser and finds the interface intuitive and easy to navigate."},"problem_statement":"Biology professors and students lack a comprehensive, accurate, and engaging online resource for learning about frog species, leading to frustration, time wasted on searching multiple sources, and a suboptimal learning experience."}"""
-    data = json.loads(design.last_message) #getting the last message from the design thinking agent
+    data = json5.loads(design.last_message) #getting the last message from the design thinking agent
     print("problem statement: " + data["problem_statement"])
     if (viability.last_message == ""):
         result = viability.run(data["problem_statement"]) #run the viability agent on the problem statement
@@ -92,5 +93,12 @@ def findFreePort():
         s.bind(('', 0))
         return s.getsockname()[1]
 
+port = findFreePort()
+os.environ["ALMANACPORT"] = str(port)
+
+with open("flask_port.json", "w") as f:
+    json.dump({"port": os.environ["ALMANACPORT"]}, f)
+
 if __name__ == '__main__':
-  app.run(host='0.0.0.0', port = findFreePort())
+    print(f"Running Flask on port {port}")
+    app.run(host='0.0.0.0', port = port)  # Use dynamic port
