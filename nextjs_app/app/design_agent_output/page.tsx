@@ -4,6 +4,7 @@ import EmpathyMap from '../components/EmpathyMap';
 import CustomerJourney from '../components/CustomerJourney';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
+import JSON5 from 'json5';
 
 // TODO this is just sample data so that you can test out the UI design without using an API call
 const data = {
@@ -49,21 +50,41 @@ const data = {
   "problem_statement": "Biology professors and students lack a comprehensive, accurate, and engaging online resource for learning about frog species, leading to frustration, time wasted on searching multiple sources, and a suboptimal learning experience."      
 };
 
+
+const parseWithJSON5 = (jsonStr: string) => {
+  try {
+    return JSON5.parse(jsonStr);
+  } catch (error) {
+    console.error('JSON5 parsing error:', error);
+    return null;
+  }
+};
+
 export default function DesignThinkingAgentOutput() {
   //if you want to use dummy data, comment out everything above const router = useRouter();
   const searchParams = useSearchParams();
   const result = searchParams.get('result'); // get 'result' query parameter from URL
   let parsedData;
+
   if (result) {
     try {
-      parsedData = JSON.parse(decodeURIComponent(result)); // decode the URL-encoded string and parse it as JSON
-      if (parsedData.result) {
-        parsedData.result = JSON.parse(parsedData.result);
+      const decodedResult = decodeURIComponent(result);
+      const initialParse = JSON.parse(decodedResult);
+      
+      // Fix the inner result if it's a string
+      if (typeof initialParse.result === 'string') {
+        const fixedResult = parseWithJSON5(initialParse.result);
+        if (fixedResult) {
+          parsedData = { ...initialParse, result: fixedResult };
+        }
+      } else {
+        parsedData = initialParse;
       }
     } catch (error) {
-      console.error('Json not formatted correctly:', error);
+      console.error('Error parsing data:', error);
     }
   }
+
   console.log('Raw Result:', result); 
   console.log('Parsed Data:', parsedData)
   console.log("result: ", parsedData.result)
