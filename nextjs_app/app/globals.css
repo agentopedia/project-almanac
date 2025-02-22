@@ -39,6 +39,12 @@ html, body {
   background-color: var(--background-color);
 }
 
+	
+.header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
 h1, p {
   color: white;
 }
@@ -126,6 +132,58 @@ button:hover, .button:hover {
   text-decoration: none;
 }
 
+		
+/* SWE agent*/
+.swe-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 60rem;
+}
+
+/* swe card has a hover function */
+.swe-card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+.swe-card:hover {
+  transform: scale(1.05) translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  background-color: #f0f0f0;
+}
+
+/* SWE agent page layout */
+.page-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+/* .container {
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: left;
+} */
+
+/* swe side navigation bar */
+.sidenav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 180px;
+  margin-right: 20px;
+  margin-top: 280px;
+  font-size: 1.25rem;
+}
+
 /* Product Ideation text area */
 .textarea {
   width: 600px;
@@ -170,6 +228,15 @@ button:hover, .button:hover {
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.cardTitle {
+  color: #333333;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+.cardText {
+  color: #676f7a;
 }
 
 .form-group {
@@ -270,7 +337,26 @@ button:hover, .button:hover {
   flex-direction: column;
   gap: 10px;
   width: 180px;
-  margin-right: 20px;
+  margin-right: 10px;
+  margin-top: 10px;
+  max-height: 350px;
+  overflow-y: auto;
+  padding-left: 6px;
+  padding-right: 6px;
+  direction: rtl;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .sidebar button {
@@ -291,10 +377,13 @@ button:hover, .button:hover {
 
 .sidebar button:hover {
   transform: scale(1.05);
+  background-color: #2f7ce2
 }
 
 /* Product Section Styles */
 .product-section {
+  width: 700px;
+  min-height: 350px;
   flex: 1;
   margin: 10px;
   padding: 20px;
@@ -303,12 +392,11 @@ button:hover, .button:hover {
   color: white;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 700px;
-  height: 350px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  height: auto;
 }
 
 .product-section h2 {

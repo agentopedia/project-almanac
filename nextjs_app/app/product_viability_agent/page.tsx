@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
+import React from "react";
 
 type ProductData = {
   introduction: string;
@@ -10,28 +11,12 @@ type ProductData = {
   productFeatures: string;
   functionalRequirements: string;
   nonfunctionalRequirements: string;
+  valuePropositions: string;
+  channels: string;
+  revenueStreams: string;
+  keyActivities: string;
+  costStructure: string;
 };
-
-// type DesignAgentData = {
-//   customer_persona: Array<{
-//     name: string;
-//     demographics: { age: number; gender: string; occupation: string };
-//     description: string;
-//   }>;
-//   empathy_map: {
-//     says: string[];
-//     thinks: string[];
-//     does: string[];
-//     feels: string[];
-//   };
-//   customer_journey_map: {
-//     awareness: string;
-//     comparison: string;
-//     purchase: string;
-//     installation: string;
-//   };
-//   problem_statement: string;
-// };
 
 const ProductViability = () => {
   const [activeSection, setActiveSection] = useState<string>("Introduction");
@@ -61,18 +46,6 @@ const ProductViability = () => {
     }
   }, [data]);
 
-  // parse design agent data
-  // useEffect(() => {
-  //   if (fromDesign) {
-  //     try {
-  //       const parsedData = JSON.parse(decodeURIComponent(fromDesign));
-  //       setParsedFromDesign(parsedData);
-  //     } catch (error) {
-  //       console.error("Error parsing fromDesign data:", error);
-  //     }
-  //   }
-  // }, [fromDesign]);
-
   // timeout to change `loadingTimeoutReached` after 3 seconds
   useEffect(() => {
     if (!parsedProductData) {
@@ -91,15 +64,14 @@ const ProductViability = () => {
     { key: "productFeatures", label: "Product Features" },
     { key: "functionalRequirements", label: "Functional Requirements" },
     { key: "nonfunctionalRequirements", label: "Nonfunctional Requirements" },
+    { key: "valuePropositions", label: "Value Propositions" },
+    { key: "channels", label: "Channels" },
+    { key: "revenueStreams", label: "Revenue Streams" },
+    { key: "keyActivities", label: "Key Activities" },
+    { key: "costStructure", label: "Cost Structure" }
   ];
 
   const handleBackToDesign = async () => {
-    // if (parsedFromDesign) {
-    //   const encodedData = encodeURIComponent(JSON.stringify(parsedFromDesign));
-    //   router.push(`/design_agent_output?result=${encodedData}`);
-    // } else {
-    //   console.error("No design data available to navigate back.");
-    // }
     try {
       // Make a GET request to the Next.js API route
       const response = await fetch("/api/design_backtracking", {
@@ -120,14 +92,61 @@ const ProductViability = () => {
 
   };
 
-  const getSectionData = (key: string): string => {
+  // version of getSectionData function that has no paragraph breaks - can delete
+  // const getSectionData = (key: string): string => {
+  //   const validKey = key as keyof ProductData;
+  
+  //   if (!parsedProductData) {
+  //     return loadingTimeoutReached ? "No data available" : "Loading...";
+  //   }
+  //   const sectionData = parsedProductData[validKey];
+
+  //   if (Array.isArray(sectionData)) {
+  //     return sectionData.join("\n");
+  //   }
+
+  //   return parsedProductData[validKey] || "No data available";
+  // };
+
+  const getSectionData = (key: string): JSX.Element => {
     const validKey = key as keyof ProductData;
+  
     if (!parsedProductData) {
-      return loadingTimeoutReached ? "No data available" : "Loading...";
+      return <p>{loadingTimeoutReached ? "No data available" : "Loading..."}</p>;
     }
-    return parsedProductData[validKey] || "No data available";
+  
+    const sectionData = parsedProductData[validKey];
+  
+    if (Array.isArray(sectionData)) {
+      return (
+        <>
+          {sectionData.map((item, index) => (
+            <p key={index} style={{ marginBottom: "0px" }}>
+              {item}
+            </p>
+          ))}
+        </>
+      );
+    }
+    return <p>parsedProductData[validKey] || "No data available" </p>;
   };
 
+  // const adjustSidebarHeight = () => {
+  //   const productSection = document.querySelector(".product-section") as HTMLElement;
+  //   const sidebar = document.querySelector(".sidebar") as HTMLElement;
+  
+  //   if (productSection && sidebar) {
+  //     sidebar.style.maxHeight = `${productSection.offsetHeight}px`;
+  //   }
+  // };
+  
+  // useEffect(() => {
+  //   adjustSidebarHeight();
+  //   window.addEventListener("resize", adjustSidebarHeight);
+  //   return () => window.removeEventListener("resize", adjustSidebarHeight);
+  // }, []);
+   
+  
   return (
     <div style={{ padding: "20px", minHeight: "100vh", backgroundColor: "#222" }}>
       <header style={{ textAlign: "center", marginBottom: "20px", color: "white" }}>
@@ -150,7 +169,10 @@ const ProductViability = () => {
             <button
               key={section.key}
               className={activeSection === section.label ? "active" : ""}
-              onClick={() => setActiveSection(section.label)}
+              onClick={() => {
+                setActiveSection(section.label);
+                // adjustSidebarHeight();
+              }}
             >
               {section.label}
             </button>
@@ -160,16 +182,19 @@ const ProductViability = () => {
         {/* Active Section */}
         <div className="product-section" style={{ flex: 1 }}>
           <h2>{activeSection}</h2>
-          <p>
+          {/* <p style={{ whiteSpace: "pre-line" }}> */}
             {getSectionData(activeSection.toLowerCase().replace(/ /g, "_"))}
-          </p>
-
+          {/* </p> */}
+        
           {/* Footer Buttons */}
           <div className="footer-buttons">
             <button
               onClick={() => {
                 const currentIndex = sections.findIndex((s) => s.label === activeSection);
-                if (currentIndex > 0) setActiveSection(sections[currentIndex - 1].label);
+                if (currentIndex > 0) {
+                  setActiveSection(sections[currentIndex - 1].label);
+                  // adjustSidebarHeight(); 
+                }
               }}
               disabled={activeSection === "Introduction"}
               style={{
@@ -182,14 +207,16 @@ const ProductViability = () => {
             <button
               onClick={() => {
                 const currentIndex = sections.findIndex((s) => s.label === activeSection);
-                if (currentIndex < sections.length - 1)
+                if (currentIndex < sections.length - 1) {
                   setActiveSection(sections[currentIndex + 1].label);
+                  // adjustSidebarHeight();
+                }
               }}
-              disabled={activeSection === "Nonfunctional Requirements"}
+              disabled={activeSection === "Cost Structure"}
               style={{
-                opacity: activeSection === "Nonfunctional Requirements" ? "0.5" : "1",
+                opacity: activeSection === "Cost Structure" ? "0.5" : "1",
                 pointerEvents:
-                  activeSection === "Nonfunctional Requirements" ? "none" : "auto",
+                  activeSection === "Cost Structure" ? "none" : "auto",
               }}
             >
               Next
