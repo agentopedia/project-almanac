@@ -5,51 +5,7 @@ import CustomerJourney from '../components/CustomerJourney';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import JSON5 from 'json5';
-
-// TODO this is just sample data so that you can test out the UI design without using an API call
-const data = {
-  "customer_persona": [
-    {
-      "name": "Professor Annelise",
-      "demographics": {
-        "age": 45,
-        "gender": "Female",
-        "occupation": "Biology Professor"
-      },
-      "description": "Annelise is a dedicated biology professor with a passion for herpetology. She is always looking for engaging and reliable resources to use in her classes and for her own research. She values accuracy and up-to-date information, and appreciates user-friendly interfaces that make it easy to find what she needs.",
-    }
-  ],
-  "empathy_map": {
-    "says": [
-      "I need a reliable source of information on frog species.",
-      "My students need engaging learning materials.",
-      "It's difficult to find all the information I need in one place."
-    ],
-    "thinks": [
-      "This web app could save me a lot of time.",
-      "I hope the information is accurate and up-to-date.",
-      "Will this app be engaging enough for my students?"
-    ],
-    "does": [
-      "Searches online for frog information.",
-      "Looks through textbooks and journals.",
-      "Prepares lectures and assignments using various resources."
-    ],
-    "feels": [
-      "Frustrated by the lack of a comprehensive resource.",
-      "Overwhelmed by the amount of information to sift through.",
-      "Excited about the potential of a user-friendly web app."
-    ]
-  },
-  "customer_journey_map": {
-    "awareness": "Annelise hears about the web app from a colleague at a conference.", 
-    "comparison": "She compares the web app to other online resources, checking for accuracy, comprehensiveness, and user-friendliness.",
-    "purchase": "She decides to use the web app for its comprehensive information and engaging features, free of charge.",
-    "installation": "She easily accesses the web app through her browser and finds the interface intuitive and easy to navigate."
-  },
-  "problem_statement": "Biology professors and students lack a comprehensive, accurate, and engaging online resource for learning about frog species, leading to frustration, time wasted on searching multiple sources, and a suboptimal learning experience."      
-};
-
+import { useState } from "react";
 
 const parseWithJSON5 = (jsonStr: string) => {
   try {
@@ -61,6 +17,8 @@ const parseWithJSON5 = (jsonStr: string) => {
 };
 
 export default function DesignThinkingAgentOutput() {
+  const [loading, setLoading] = useState(false);
+
   //if you want to use dummy data, comment out everything above const router = useRouter();
   const searchParams = useSearchParams();
   const result = searchParams.get('result'); // get 'result' query parameter from URL
@@ -92,6 +50,8 @@ export default function DesignThinkingAgentOutput() {
   const router = useRouter();
 
   const handleProceed = async () => {
+    setLoading(true); // show loading screen
+
     try {
       // make a GET request to the Next.js API route
       const response = await fetch("/api/viability", {
@@ -108,6 +68,8 @@ export default function DesignThinkingAgentOutput() {
       }
     } catch (error) {
       console.error("Error during the GET request:", error);
+    } finally {
+      setLoading(false); // hide loading screen
     }
   };  
   
@@ -123,6 +85,9 @@ export default function DesignThinkingAgentOutput() {
         textAlign: "center",
       }}
     >
+      {/* Loading Screen */}
+      {loading && <div className="loading-overlay">Loading Product Viability Agent...</div>}
+
       <main style={{ width: "80%" }}>
         <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>Design Thinking Agent</h1>
 
