@@ -1,6 +1,5 @@
 "use client";
 import Link from 'next/link';
-// import { useRouter } from 'next/router';
 import { useState } from 'react';
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -47,7 +46,7 @@ export default function DesignThinkingAgentInput() {
         <p style={{ fontSize: "1.25rem", marginBottom: "2rem" }}>Begin your journey of MVP generation</p>
 
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <form>
+          <form onSubmit={handleSubmit}>
             {/* Input Field */}
             <textarea
               placeholder="Enter product description..."
@@ -58,7 +57,10 @@ export default function DesignThinkingAgentInput() {
 
             {/* Navigation Buttons */}
             <div className="navigation-buttons">
-              <button onClick={() => router.push("/")}>
+              <button onClick={(event) => { 
+                event.preventDefault();
+                router.push("/");
+              }}>
                 Back to Home
               </button>
               <button onClick={handleSubmit}
