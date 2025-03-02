@@ -72,7 +72,7 @@ export default function DesignThinkingAgentOutput() {
         const data = await response.json();
         console.log('data:', data)
         console.log('data.result type in design output: ', typeof data.result);
-        setParsedData(JSON.parse(data.result)); // Update state with the fetched message
+        setParsedData(JSON5.parse(data.result)); // Update state with the fetched message
       } catch (error) {
         console.error('Error fetching last message:', error);
       }
@@ -122,7 +122,7 @@ export default function DesignThinkingAgentOutput() {
       const data = await response.json();
   
       if (response.ok) {
-        console.log("Data from Flask server:", data);
+        console.log("PRD from Flask server:", data);
         const encodedData = encodeURIComponent(JSON.stringify(data));
         router.push(`/product_viability_agent?data=${encodedData}`);
       } else {

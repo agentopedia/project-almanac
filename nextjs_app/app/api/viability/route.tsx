@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import fs from 'fs';
 import path from 'path';
 
+const dataFilePath = path.join(process.cwd(), 'data', 'lastMessage.json'); // data/lastMessage.json is where the info is being stored
+
+
 function getAlmanacPortFromFile(): string | null {
     try {
       const filePath = path.join(process.cwd(), 'flask_backend', 'flask_port.json');
@@ -13,7 +16,14 @@ function getAlmanacPortFromFile(): string | null {
       return null;
     }
   }
-  
+
+function saveLastMessage(message: any) {
+  try {
+    fs.writeFileSync(dataFilePath, JSON.stringify(message, null, 2)); //might need to remove stringify
+  } catch (error) {
+    console.error("Error saving message:", error);
+  }
+}
 
 export async function GET() {
     // Forward the GET request to the Flask server 
@@ -27,7 +37,9 @@ export async function GET() {
     }
 
     const data = await flaskResponse.json();
-
+    saveLastMessage(data.response);
     // Return the response to the client
     return NextResponse.json(data);
 }
+
+

@@ -27,7 +27,6 @@ const ProductViability = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const data = searchParams.get("data");
-  // const fromDesign = searchParams.get("fromDesign");
 
   // parse product viability data
   useEffect(() => {
@@ -35,12 +34,13 @@ const ProductViability = () => {
       try {
         const parsedData = JSON.parse(decodeURIComponent(data));
 
-        const productData =
-          typeof parsedData.data === "string"
-            ? JSON.parse(parsedData.data)
-            : parsedData.data;
+        if (typeof parsedData.result === "string") {
+          parsedData.result = JSON.parse(parsedData.result);
+        }
+  
+        console.log("Parsed PRD:", parsedData);
+        setParsedProductData(parsedData.result);
 
-        setParsedProductData(productData);
       } catch (error) {
         console.error("Error parsing data:", error);
       }

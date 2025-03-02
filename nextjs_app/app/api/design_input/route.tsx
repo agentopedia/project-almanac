@@ -4,8 +4,7 @@ import {NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-const filePath = path.join(process.cwd(), 'data', 'lastMessage.json'); // data/lastMessage.json is where the info is being stored
-// let lastMessage = {}; // in-memory storage
+const dataFilePath = path.join(process.cwd(), 'data', 'lastMessage.json'); // data/lastMessage.json is where the info is being stored
 
 function getAlmanacPortFromFile(): string | null {
   try {
@@ -21,16 +20,16 @@ function getAlmanacPortFromFile(): string | null {
 
 function saveLastMessage(message: any) {
   try {
-    fs.writeFileSync(filePath, JSON.stringify(message, null, 2)); //might need to remove stringify
+    fs.writeFileSync(dataFilePath, JSON.stringify(message, null, 2)); //might need to remove stringify
   } catch (error) {
     console.error("Error saving message:", error);
   }
 }
 
-// Function to get lastMessage from the file
+
 function getLastMessageFromFile() {
   try {
-    const data = fs.readFileSync(filePath, 'utf-8');
+    const data = fs.readFileSync(dataFilePath, 'utf-8');
     return JSON.parse(data); //so this data.result becomes a json
   } catch (error) {
     console.error("Error reading message:", error);

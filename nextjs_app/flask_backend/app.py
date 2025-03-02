@@ -47,7 +47,7 @@ def get_swe_data():
     else:
         result = swe.last_message
     print(result)
-    response = {"message": "Success", "data": result}
+    response = {"message": "Success", "result": result}
     return jsonify(response), 200
 
 @app.route('/viability', methods=['GET'])
@@ -65,7 +65,7 @@ def get_viability_data():
     #just for testing purposes
     # result = """{"introduction":["This product is a web application designed to provide biology professors and students with a comprehensive, accurate, and engaging online resource for learning about frog species. It addresses the current lack of a centralized, reliable source of information, saving users time and enhancing the learning experience."],"goals":["To create a one-stop online resource for all things related to frog species.","To provide accurate, up-to-date, and reliable information for both educational and research purposes.","To offer an engaging and user-friendly interface that caters to both professors and students.","To improve the efficiency of information gathering for biology educators and students.","To enhance the learning and research experience related to herpetology."],"target_audience":["Biology professors teaching courses related to herpetology or ecology.","University students studying biology, zoology, or related fields.","Researchers conducting studies on frog species.","Anyone with a general interest in learning about frog species."],"product_features":["A comprehensive database of frog species information, including taxonomy, morphology, habitat, behavior, and conservation status.","High-quality images and videos of various frog species.","Interactive maps showing the geographic distribution of different frog species.","Engaging learning modules and quizzes to enhance knowledge retention.","A search function to easily find specific information.","Downloadable resources such as fact sheets and presentations.","A user-friendly interface accessible on various devices."],"functional_requirements":["The application should allow users to search for information on specific frog species using keywords or scientific names.","The application should display detailed information about each frog species, including images, videos, and geographic distribution maps.","The application should provide interactive learning modules and quizzes.","The application should allow users to download resources such as fact sheets and presentations.","The application should be responsive and accessible across different devices and browsers.","The application should be integrated with a reliable and up-to-date source of information on frog species."],"nonfunctional_requirements":["The application should be user-friendly and intuitive.","The information presented should be accurate, reliable, and up-to-date.","The application should be accessible to users with disabilities.","The application should be secure and protect user data.","The application should be scalable to handle a large number of users and data.","The application should be performant and load quickly."]}"""
     print(result)
-    response = {"message": "Success", "data": result}
+    response = {"message": "Success", "result": result}
     return jsonify(response), 200
 
 @app.route('/design_backtracking', methods=['GET'])
