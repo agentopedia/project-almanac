@@ -4,7 +4,8 @@ import {NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-let lastMessage = null; // in-memory storage
+const filePath = path.join(process.cwd(), 'data', 'lastMessage.json'); // data/lastMessage.json is where the info is being stored
+// let lastMessage = {}; // in-memory storage
 
 function getAlmanacPortFromFile(): string | null {
   try {
@@ -17,6 +18,26 @@ function getAlmanacPortFromFile(): string | null {
     return null;
   }
 }
+
+function saveLastMessage(message: any) {
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(message, null, 2)); //might need to remove stringify
+  } catch (error) {
+    console.error("Error saving message:", error);
+  }
+}
+
+// Function to get lastMessage from the file
+function getLastMessageFromFile() {
+  try {
+    const data = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(data); //so this data.result becomes a json
+  } catch (error) {
+    console.error("Error reading message:", error);
+    return null;
+  }
+}
+
 
 export async function POST(req: NextRequest) {
   if (req.method == 'POST') {
@@ -31,7 +52,13 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await flaskResponse.json();
-    lastMessage = data.result; // store last message in memory
+    console.log('data.result type in api post: ', typeof data.result);
+    saveLastMessage(data.result);
     return NextResponse.json({ message: 'Form submitted successfully', result: data.result }, { status: 200 });
-  } 
+  }
+}
+
+export function GET() {
+  const lastMessage = getLastMessageFromFile();
+  return NextResponse.json({ result: lastMessage }); //put a json in another json
 }
