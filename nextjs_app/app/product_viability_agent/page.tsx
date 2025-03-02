@@ -16,17 +16,46 @@ type ProductData = {
   revenueStreams: string;
   keyActivities: string;
   costStructure: string;
+  targetMarket: string; 
+  customerRelationships: string; 
+  keyResources: string;
+  keyPartnerships: string;
+  customerSegments: string;
 };
 
 const ProductViability = () => {
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<string>("Introduction");
   const [parsedProductData, setParsedProductData] = useState<ProductData | null>(null); // parsed product data
-  // const [parsedFromDesign, setParsedFromDesign] = useState<DesignAgentData | null>(null); // parsed design data
+  const [activeTab, setActiveTab] = useState<"ProductRequirements" | "BusinessAnalysis">("ProductRequirements");
   const [loadingTimeoutReached, setLoadingTimeoutReached] = useState<boolean>(false); // track timeout state
   const router = useRouter();
   const searchParams = useSearchParams();
   const data = searchParams.get("data");
+
+  // Sections for each tab
+  const productSections = [
+    { key: "introduction", label: "Introduction" },
+    { key: "goals", label: "Goals" },
+    { key: "targetAudience", label: "Target Audience" },
+    { key: "productFeatures", label: "Product Features" },
+    { key: "functionalRequirements", label: "Functional Requirements" },
+    { key: "nonfunctionalRequirements", label: "Nonfunctional Requirements" }
+  ];
+  const businessSections = [
+    { key: "targetMarket", label: "Target Market" }, 
+    { key: "customerSegments", label: "Customer Segments" }, 
+    { key: "valuePropositions", label: "Value Propositions" }, 
+    { key: "channels", label: "Channels" }, // 3. Channels
+    { key: "customerRelationships", label: "Customer Relationships" }, 
+    { key: "revenueStreams", label: "Revenue Streams" }, 
+    { key: "keyResources", label: "Key Resources" }, 
+    { key: "keyActivities", label: "Key Activities" }, 
+    { key: "keyPartnerships", label: "Key Partnerships" }, 
+    { key: "costStructure", label: "Cost Structure" },
+  ];
+  // Determine which sections to show based on the active tab
+  const sections = activeTab === "ProductRequirements" ? productSections : businessSections;
 
   // parse product viability data
   useEffect(() => {
@@ -68,19 +97,12 @@ const ProductViability = () => {
     }
   }, [parsedProductData]);
 
-  const sections = [
-    { key: "introduction", label: "Introduction" },
-    { key: "goals", label: "Goals" },
-    { key: "targetAudience", label: "Target Audience" },
-    { key: "productFeatures", label: "Product Features" },
-    { key: "functionalRequirements", label: "Functional Requirements" },
-    { key: "nonfunctionalRequirements", label: "Nonfunctional Requirements" },
-    { key: "valuePropositions", label: "Value Propositions" },
-    { key: "channels", label: "Channels" },
-    { key: "revenueStreams", label: "Revenue Streams" },
-    { key: "keyActivities", label: "Key Activities" },
-    { key: "costStructure", label: "Cost Structure" }
-  ];
+  // Ensure active section updates correctly when switching tabs
+  useEffect(() => {
+    if (!sections.some((s) => s.label === activeSection)) {
+      setActiveSection(sections[0].label);
+    }
+  }, [activeTab, sections]);
 
   const handleBackToDesign = async () => {
     try {
@@ -126,11 +148,12 @@ const ProductViability = () => {
   };
 
   return (
-    <div style={{ padding: "20px", minHeight: "100vh", backgroundColor: "#222" }}>
+    <div style={{ padding: "20px", minHeight: "100vh", backgroundColor: "#222", color: "white" }}>
       {loading ? (
         <div className="loading-overlay">Loading Autonomous SWE Agent...</div>
       ) : (
         <>
+          {/* Header */}
           <header style={{ textAlign: "center", marginBottom: "20px", color: "white" }}>
             <h1 style={{ fontSize: "2.5rem" }}>Product Viability Agent</h1>
             <p>Define your product requirements</p>
@@ -142,6 +165,36 @@ const ProductViability = () => {
               [Product Name].pdf
             </a>
           </header>
+
+          {/* Tab Selection */}
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "10px" }}>
+            <button
+              onClick={() => setActiveTab("ProductRequirements")}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: activeTab === "ProductRequirements" ? "#007bff" : "#444",
+                color: "white",
+                border: "none",
+                cursor: "pointer",
+                marginRight: "10px"
+              }}
+            >
+              Product Requirements
+            </button>
+
+            <button
+              onClick={() => setActiveTab("BusinessAnalysis")}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: activeTab === "BusinessAnalysis" ? "#007bff" : "#444",
+                color: "white",
+                border: "none",
+                cursor: "pointer"
+              }}
+            >
+              Business Analysis
+            </button>
+          </div>
 
           {/* Main Content */}
           <div style={{ display: "flex", gap: "20px" }}>
@@ -170,10 +223,10 @@ const ProductViability = () => {
                     const currentIndex = sections.findIndex((s) => s.label === activeSection);
                     if (currentIndex > 0) setActiveSection(sections[currentIndex - 1].label);
                   }}
-                  disabled={activeSection === "Introduction"}
+                  disabled={activeSection === sections[0].label}
                   style={{
-                    opacity: activeSection === "Introduction" ? "0.5" : "1",
-                    pointerEvents: activeSection === "Introduction" ? "none" : "auto",
+                    opacity: activeSection ===  sections[0].label ? "0.5" : "1",
+                    pointerEvents: activeSection === sections[0].label ? "none" : "auto",
                   }}
                 >
                   Back
@@ -183,10 +236,10 @@ const ProductViability = () => {
                     const currentIndex = sections.findIndex((s) => s.label === activeSection);
                     if (currentIndex < sections.length - 1) setActiveSection(sections[currentIndex + 1].label);
                   }}
-                  disabled={activeSection === "Cost Structure"}
+                  disabled={activeSection === sections[sections.length - 1].label}
                   style={{
-                    opacity: activeSection === "Cost Structure" ? "0.5" : "1",
-                    pointerEvents: activeSection === "Cost Structure" ? "none" : "auto",
+                    opacity: activeSection === sections[sections.length - 1].label ? "0.5" : "1",
+                    pointerEvents: activeSection === sections[sections.length - 1].label ? "none" : "auto",
                   }}
                 >
                   Next
@@ -198,7 +251,7 @@ const ProductViability = () => {
           {/* Navigation Buttons */}
           <div className="navigation-buttons">
             <button onClick={handleBackToDesign}>Back to Design Thinking Agent</button>
-            <button onClick={() => router.push("")}>Proceed to Business Model Agent</button>
+            <button onClick={() => router.push("")}>Proceed to Software Engineering Agent</button>
           </div>
         </>
       )}
