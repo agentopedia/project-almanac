@@ -194,17 +194,90 @@ button:hover, .button:hover {
 
 /* swe card has a hover function */
 .swe-card {
-  background-color: var(--surface-color);
+  background-color: var(--primary-color);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  color: white;
 }
 .swe-card:hover {
   transform: scale(1.05) translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  background-color: #f0f0f0;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  background-color: var(--button-hover-color);
+}
+
+.swe-card .cardTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color:white
+}
+
+.swe-card .cardText {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* SWE agent feature page */
+/* .feature-card {
+  background-color: var(--surface-color);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.feature-card .cardTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.feature-card .cardText {
+  color: var(--text-color-secondary);
+  margin-top: 10px;
+} */
+/* Features Section */
+.features-section {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  color: black;
+}
+
+.features-section .feature-description p {
+  color: black;
+}
+
+/* Feature Card */
+.feature-card {
+  background-color: #0057d9; /* Blue background */
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.feature-title {
+  color: rgb(255, 255, 255);
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Description Box */
+.feature-description {
+  background-color: rgb(236, 236, 236);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  color: rgb(0, 0, 0) !important;
 }
 
 /* SWE agent page layout */
@@ -213,6 +286,7 @@ button:hover, .button:hover {
   justify-content: center;
   align-items: flex-start;
   gap: 20px;
+  height: 100vh;
 }
 
 /* .container {
@@ -225,12 +299,13 @@ button:hover, .button:hover {
 
 /* swe side navigation bar */
 .sidenav {
+  width: 200px; /* Adjust width as needed */
+  padding: 20px;
+  height: 100vh; /* Full height */
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 180px;
-  margin-right: 20px;
-  margin-top: 280px;
+  align-items: flex-start;
+  justify-content: center; /* Center vertically */
   font-size: 1.25rem;
 }
 

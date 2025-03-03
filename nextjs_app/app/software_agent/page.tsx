@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
 import '../globals.css';
-import SideNav from "../components/SideNav"; //side navigation menu
+import SideNav from "../components/SideNav";
 
-const MVPPage: React.FC = () => {
+const Software_Agent: React.FC = () => {
   return (
     <div className="page-container">
       <SideNav />
@@ -39,4 +39,4 @@ const MVPPage: React.FC = () => {
   );
 };
 
-export default MVPPage;
+export default Software_Agent;

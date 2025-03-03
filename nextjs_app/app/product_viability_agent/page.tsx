@@ -251,7 +251,7 @@ const ProductViability = () => {
           {/* Navigation Buttons */}
           <div className="navigation-buttons">
             <button onClick={handleBackToDesign}>Back to Design Thinking Agent</button>
-            <button onClick={() => router.push("")}>Proceed to Software Engineering Agent</button>
+            <button onClick={() => router.push("/software_agent")}>Proceed to Software Engineering Agent</button>
           </div>
         </>
       )}
