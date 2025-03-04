@@ -8,6 +8,7 @@ import json5
 import json
 import os
 import socket
+import re
 
 os.environ['GOOGLE_API_KEY'] = "AIzaSyCcN7Yo1ONOFYn5wCzPcBxTXfk7wyUFlko"
 gemini_api_key = os.getenv("GOOGLE_API_KEY")
@@ -28,7 +29,7 @@ def run_agent():
     #resetting all the agents' last message
     design.last_message = ""
     viability.last_message = ""
-    # swe.last_message = ""
+    swe.last_message = "" # UNCOMMENTED
     data = request.json
     query = data['query']
     print("query: " + query)
@@ -36,18 +37,6 @@ def run_agent():
     result = design.cleanJsonContent(result['messages'][-1].content) #getting the last message and formatting that output
     print(result)
     response = {"message": "Query received", "result": result}
-    return jsonify(response), 200
-
-@app.route('/swe', methods=['GET'])
-def get_swe_data():
-    data = json5.loads(viability.last_message)
-    if (swe.last_message == ""):
-        result = swe.run(data)
-        result = swe.cleanJsonContent(result['messages'][-1].content)
-    else:
-        result = swe.last_message
-    print(result)
-    response = {"message": "Success", "result": result}
     return jsonify(response), 200
 
 @app.route('/viability', methods=['GET'])
@@ -86,6 +75,43 @@ def get_product_idea():
     result = design.product_idea
     print("product idea: " + result)
     response = {"message": "Success", "result": result}
+    return jsonify(response), 200
+
+@app.route('/swe_model', methods=['POST'])
+def swe_model_endpoint():
+    data = request.json
+    # Process the data from the frontend
+    button_name = data.get('buttonName', '')
+    
+    response = {
+        "status": "success",
+        "message": f"Received data for button: {button_name}",
+        "data": data
+    }
+    return jsonify(response), 200
+
+@app.route('/generate_mvp', methods=['GET'])
+def generate_mvp():
+    # Endpoint to generate the MVP code based on PRD
+    data = json5.loads(viability.last_message)
+    
+    if (swe.last_message == ""):
+        result = swe.run(json.dumps(data))
+        result = result['messages'][-1].content
+        swe.last_message = result
+
+        cleanedResult = re.sub(r'`(?:jsx|css|javascript)?\n?', '', result) # Remove `jsx, `css, `javascript, and ``` (with optional newline after)
+        cleanedResult = re.sub(r'`', '', cleanedResult) # Remove any remaining `
+        # cleanedResult = re.sub(r'//.*', '', cleanedResult) # Remove single-line JavaScript comments (// ...)
+        cleanedResult = cleanedResult.strip() # Trim whitespace
+
+        swe.last_message = cleanedResult
+        result = cleanedResult
+    else:
+        result = swe.last_message
+        
+    response = {"message": "MVP generated successfully", "result": result}
+    print(response)
     return jsonify(response), 200
 
 def findFreePort():
