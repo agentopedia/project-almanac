@@ -3,18 +3,8 @@ import Link from 'next/link';
 import EmpathyMap from '../components/EmpathyMap';
 import CustomerJourney from '../components/CustomerJourney';
 import { useRouter } from 'next/navigation';
-import { useSearchParams } from 'next/navigation';
 import JSON5 from 'json5';
 import { useEffect, useState } from "react";
-
-const parseWithJSON5 = (jsonStr: string) => {
-  try {
-    return JSON5.parse(jsonStr);
-  } catch (error) {
-    console.error('JSON5 parsing error:', error);
-    return null;
-  }
-};
 
 interface CustomerPersona {
   name: string;
@@ -43,6 +33,16 @@ interface ParsedData {
   problem_statement: string;
 }
 
+const defaultPersona: CustomerPersona = {
+  name: "",
+  demographics: {
+    age: 0,
+    gender: "",
+    occupation: ""
+  },
+  description: ""
+};
+
 const defaultEmpathyData = {
   says: [""],
   thinks: [""],
@@ -61,55 +61,90 @@ const defaultJourneyMap = {
 export default function DesignThinkingAgentOutput() {
   const [loading, setLoading] = useState(false);
   const [parsedData, setParsedData] = useState<ParsedData | null>(null);
+  const [persona, setPersona] = useState<CustomerPersona>(defaultPersona);
+  const [originalPersona, setOriginalPersona] = useState<CustomerPersona | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchLastMessage() {
       try {
-        const response = await fetch('/api/design_input'); // GET request to design_input api
+        const response = await fetch("/api/design_input");
         if (!response.ok) {
-          throw new Error('Failed to fetch last message');
+          throw new Error("Failed to fetch last message");
         }
         const data = await response.json();
-        console.log('data:', data)
-        console.log('data.result type in design output: ', typeof data.result);
-        setParsedData(JSON5.parse(data.result)); // Update state with the fetched message
+        console.log("Fetched data:", data);
+  
+        const parsed = JSON5.parse(data.result);
+        setParsedData(parsed);
+  
+        // Load persona from API response
+        if (parsed?.customer_persona?.length > 0) {
+          setPersona(parsed.customer_persona[0]); // load the latest persona
+        }
       } catch (error) {
-        console.error('Error fetching last message:', error);
+        console.error("Error fetching last message:", error);
       }
     }
-
+  
     fetchLastMessage();
-  }, []);
+  }, []);  
 
   console.log('Parsed Data:', parsedData)
-  // const searchParams = useSearchParams();
-  // const result = searchParams.get('result'); // get 'result' query parameter from URL
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setPersona((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleDemographicsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPersona((prev) => ({
+      ...prev,
+      demographics: {
+        ...prev.demographics,
+        [name]: value
+      }
+    }));
+  };
+
+  const handleEdit = () => {
+    setOriginalPersona({ ...persona }); // store current state before editing
+    setIsEditing(true);
+  };  
+
+  const handleCancel = () => {
+    if (originalPersona) {
+      setPersona(originalPersona); // restore original data
+    }
+    setIsEditing(false);
+  };  
+
+  const handleSave = async () => {
+    try {
+      const response = await fetch("/api/update_persona", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(persona),
+      });
   
-
-  // if (result) {
-  //   try {
-  //     const decodedResult = decodeURIComponent(result);
-  //     const initialParse = JSON.parse(decodedResult);
-      
-  //     // Fix the inner result if it's a string
-  //     if (typeof initialParse.result === 'string') {
-  //       const fixedResult = parseWithJSON5(initialParse.result);
-  //       if (fixedResult) {
-  //         parsedData = { ...initialParse, result: fixedResult };
-  //       }
-  //     } else {
-  //       parsedData = initialParse;
-  //     }
-  //   } catch (error) {
-  //     console.error('Error parsing data:', error);
-  //   }
-  // }
-
-  // console.log('Raw Result:', result); 
-  // console.log('Parsed Data:', parsedData)
-  // console.log("result: ", parsedData.result)
-
-  const router = useRouter();
+      if (!response.ok) {
+        throw new Error("Failed to save persona");
+      }
+  
+      console.log("Persona updated successfully");
+    } catch (error) {
+      console.error("Error updating persona:", error);
+    }
+  
+    setIsEditing(false);
+  };    
 
   const handleProceed = async () => {
     setLoading(true); // show loading screen
@@ -154,33 +189,91 @@ export default function DesignThinkingAgentOutput() {
         <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>Design Thinking Agent</h1>
 
         {/* Customer Persona Section */}
-        <div
-          style={{
-            marginBottom: "2rem",
-            padding: "1rem",
-            borderRadius: "8px",
-            backgroundColor: "var(--primary-color)",
-            color: "white",
-            textAlign: "left",
-          }}
-        >
-          <h2 style={{fontSize: "1.75rem", textAlign: "center" }}>
-            Customer Persona
-          </h2>
-          <p>
-            <span style={{ fontWeight: "bold", color: "white" }}>Name:</span>{" "}
-            {parsedData?.customer_persona[0].name || "N/A"}
-          </p>
-          <p>
-            <span style={{ fontWeight: "bold", color: "white" }}>Demographics:</span>{" "}
-            {`Age: ${parsedData?.customer_persona[0].demographics.age || "N/A"}, `}
-            {`Gender: ${parsedData?.customer_persona[0].demographics.gender || "N/A"}, `}
-            {`Occupation: ${parsedData?.customer_persona[0].demographics.occupation || "N/A"}`}
-          </p>
-          <p>
-            <span style={{ fontWeight: "bold", color: "white" }}>Description:</span>{" "}
-            {parsedData?.customer_persona[0].description || "N/A"}
-          </p>
+        <div style={{ marginBottom: "2rem", padding: "1rem", borderRadius: "8px", backgroundColor: "var(--primary-color)", color: "white", textAlign: "left" }}>
+          <h2 style={{ fontSize: "1.75rem", textAlign: "center" }}>Customer Persona</h2>
+
+          {isEditing ? (
+            <div>
+              <label style={{ fontWeight: "bold" }}>Name:</label>
+              <input
+                type="text"
+                name="name"
+                value={persona.name}
+                onChange={handleChange}
+                style={{ width: "100%", padding: "0.5rem", margin: "0.5rem 0", borderRadius: "5px" }}
+              />
+
+              <label style={{ fontWeight: "bold" }}>Age:</label>
+              <input
+                type="number"
+                name="age"
+                value={persona.demographics.age}
+                onChange={handleDemographicsChange}
+                style={{ width: "100%", padding: "0.5rem", margin: "0.5rem 0", borderRadius: "5px" }}
+              />
+
+              <label style={{ fontWeight: "bold" }}>Gender:</label>
+              <input
+                type="text"
+                name="gender"
+                value={persona.demographics.gender}
+                onChange={handleDemographicsChange}
+                style={{ width: "100%", padding: "0.5rem", margin: "0.5rem 0", borderRadius: "5px" }}
+              />
+
+              <label style={{ fontWeight: "bold" }}>Occupation:</label>
+              <input
+                type="text"
+                name="occupation"
+                value={persona.demographics.occupation}
+                onChange={handleDemographicsChange}
+                style={{ width: "100%", padding: "0.5rem", margin: "0.5rem 0", borderRadius: "5px" }}
+              />
+
+              <label style={{ fontWeight: "bold" }}>Description:</label>
+              <textarea
+                name="description"
+                value={persona.description}
+                onChange={handleChange}
+                style={{ width: "100%", padding: "0.5rem", margin: "0.5rem 0", borderRadius: "5px", minHeight: "100px" }}
+              />
+            </div>
+          ) : (
+            <div>
+              <p><strong>Name:</strong> {persona.name}</p>
+              <p><strong>Age:</strong> {persona.demographics.age}</p>
+              <p><strong>Gender:</strong> {persona.demographics.gender}</p>
+              <p><strong>Occupation:</strong> {persona.demographics.occupation}</p>
+              <p><strong>Description:</strong> {persona.description}</p>
+            </div>
+          )}
+
+          {/* Buttons */}
+          <div style={{ textAlign: "right", marginTop: "1rem" }}>
+          {isEditing ? (
+            <>
+              <button 
+                onClick={handleSave} 
+                style={{ padding: "0.5rem 1rem", backgroundColor: "var(--secondary-color)", color: "white", border: "none", borderRadius: "5px", cursor: "pointer", marginRight: "0.5rem" }}
+              >
+                Save
+              </button>
+              <button 
+                onClick={handleCancel} 
+                style={{ padding: "0.5rem 1rem", backgroundColor: "var(--text-color-secondary)", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}
+              >
+                Cancel
+              </button>
+            </>
+          ) : (
+            <button 
+              onClick={handleEdit} 
+              style={{ padding: "0.5rem 1rem", backgroundColor: "var(--secondary-color)", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}
+            >
+              Edit
+            </button>
+          )}
+        </div>
         </div>
 
         <div
