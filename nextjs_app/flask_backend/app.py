@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from design_agent import DesignThinkingAgent
 from viability_agent import ProductViabilityAgent
 from swe_agent import SWESystemAgent
+from business_model_agent import BusinessModelAgent
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.tools.tavily_search import TavilySearchResults
 import json5
@@ -21,6 +22,7 @@ tools = [TavilySearchResults(max_results = 1, api_key = tavily_api_key)]
 app = Flask(__name__)
 design = DesignThinkingAgent(model, tools)
 viability = ProductViabilityAgent(model, tools)
+business = BusinessModelAgent(model, tools)
 swe = SWESystemAgent(model, tools)
 
 @app.route('/design_input', methods=['POST'])
@@ -57,15 +59,28 @@ def get_viability_data():
     data = json5.loads(design.last_message) #getting the last message from the design thinking agent
     print("problem statement: " + data["problem_statement"])
     if (viability.last_message == ""):
-        result = viability.run(data["problem_statement"]) #run the viability agent on the problem statement
-        result = viability.cleanJsonContent(result['messages'][-1].content) #getting cleaned content
+        viability_result = viability.run(data["problem_statement"]) #run the viability agent on the problem statement
+        viability_result = viability.cleanJsonContent(viability_result['messages'][-1].content) #getting cleaned content
     else:
         print("API not called, previous PRD loaded")
-        result = viability.last_message
+        viability_result = viability.last_message
     #just for testing purposes
-    # result = """{"introduction":["This product is a web application designed to provide biology professors and students with a comprehensive, accurate, and engaging online resource for learning about frog species. It addresses the current lack of a centralized, reliable source of information, saving users time and enhancing the learning experience."],"goals":["To create a one-stop online resource for all things related to frog species.","To provide accurate, up-to-date, and reliable information for both educational and research purposes.","To offer an engaging and user-friendly interface that caters to both professors and students.","To improve the efficiency of information gathering for biology educators and students.","To enhance the learning and research experience related to herpetology."],"target_audience":["Biology professors teaching courses related to herpetology or ecology.","University students studying biology, zoology, or related fields.","Researchers conducting studies on frog species.","Anyone with a general interest in learning about frog species."],"product_features":["A comprehensive database of frog species information, including taxonomy, morphology, habitat, behavior, and conservation status.","High-quality images and videos of various frog species.","Interactive maps showing the geographic distribution of different frog species.","Engaging learning modules and quizzes to enhance knowledge retention.","A search function to easily find specific information.","Downloadable resources such as fact sheets and presentations.","A user-friendly interface accessible on various devices."],"functional_requirements":["The application should allow users to search for information on specific frog species using keywords or scientific names.","The application should display detailed information about each frog species, including images, videos, and geographic distribution maps.","The application should provide interactive learning modules and quizzes.","The application should allow users to download resources such as fact sheets and presentations.","The application should be responsive and accessible across different devices and browsers.","The application should be integrated with a reliable and up-to-date source of information on frog species."],"nonfunctional_requirements":["The application should be user-friendly and intuitive.","The information presented should be accurate, reliable, and up-to-date.","The application should be accessible to users with disabilities.","The application should be secure and protect user data.","The application should be scalable to handle a large number of users and data.","The application should be performant and load quickly."]}"""
-    print(result)
-    response = {"message": "Success", "result": result}
+    # viability_result = """{"introduction":["This product is a web application designed to provide biology professors and students with a comprehensive, accurate, and engaging online resource for learning about frog species. It addresses the current lack of a centralized, reliable source of information, saving users time and enhancing the learning experience."],"goals":["To create a one-stop online resource for all things related to frog species.","To provide accurate, up-to-date, and reliable information for both educational and research purposes.","To offer an engaging and user-friendly interface that caters to both professors and students.","To improve the efficiency of information gathering for biology educators and students.","To enhance the learning and research experience related to herpetology."],"target_audience":["Biology professors teaching courses related to herpetology or ecology.","University students studying biology, zoology, or related fields.","Researchers conducting studies on frog species.","Anyone with a general interest in learning about frog species."],"product_features":["A comprehensive database of frog species information, including taxonomy, morphology, habitat, behavior, and conservation status.","High-quality images and videos of various frog species.","Interactive maps showing the geographic distribution of different frog species.","Engaging learning modules and quizzes to enhance knowledge retention.","A search function to easily find specific information.","Downloadable resources such as fact sheets and presentations.","A user-friendly interface accessible on various devices."],"functional_requirements":["The application should allow users to search for information on specific frog species using keywords or scientific names.","The application should display detailed information about each frog species, including images, videos, and geographic distribution maps.","The application should provide interactive learning modules and quizzes.","The application should allow users to download resources such as fact sheets and presentations.","The application should be responsive and accessible across different devices and browsers.","The application should be integrated with a reliable and up-to-date source of information on frog species."],"nonfunctional_requirements":["The application should be user-friendly and intuitive.","The information presented should be accurate, reliable, and up-to-date.","The application should be accessible to users with disabilities.","The application should be secure and protect user data.","The application should be scalable to handle a large number of users and data.","The application should be performant and load quickly."]}"""
+    print(viability_result)
+
+    ##business agent call
+    if business.last_message == "":
+        business_result = business.run(data["problem_statement"])  # Generate Business Model Canvas
+        business_result = business.cleanJsonContent(business_result['messages'][-1].content)  # Clean and return
+    else:
+        print("API not called, previous Business Model loaded")
+        business_result = business.last_message
+
+    response = {
+        "message": "Success",
+        "viability_result": viability_result,
+        "business_result": business_result
+    }
     return jsonify(response), 200
 
 @app.route('/design_backtracking', methods=['GET'])

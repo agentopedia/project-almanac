@@ -2,28 +2,12 @@ import os
 import json
 
 from agent import Agent
-
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.messages import HumanMessage
 
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 
-tavily_api_key = os.environ['TAVILY_API_KEY']
-secret_file = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-
-tools = [TavilySearchResults(max_results = 1, api_key = tavily_api_key)]
-
-settings = {
-    "client_config_backend": "service",
-    "service_config": {
-        "client_json_file_path": secret_file,
-    }
-}
-
-gauth = GoogleAuth(settings = settings)
-gauth.ServiceAuth()
-drive = GoogleDrive(gauth)
 
 class BusinessModelAgent(Agent):
     jsonFormat = {
@@ -58,20 +42,7 @@ class BusinessModelAgent(Agent):
         super().__init__(model, tools, self.prompt)
     
     def run(self, inputData):
-        def createDocument(content):
-            gdoc = drive.CreateFile({'title': 'Business Model Canvas'})
-            gdoc.SetContentString(content)
-            gdoc.Upload()
-            gdoc.InsertPermission({"type": "anyone", "value": "anyone", "role": "writer"})
-            return gdoc["alternateLink"]
-
-        messages = [HumanMessage(content = inputData)]
-        result = self.graph.invoke({"messages": messages})
-
-        cleaned_content = self.cleanJsonContent(result['messages'][-1].content)
-        markdownContent = self.convertToMarkdown(cleaned_content)
-        documentURL = createDocument(markdownContent)
-        print(f"\n\nBusiness Model Canvas document created. You can view it at: {documentURL}")
+        result = super().run(inputData)
         return result
 
     def cleanJsonContent(self, content):

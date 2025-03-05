@@ -11,6 +11,7 @@ type ProductData = {
   productFeatures: string;
   functionalRequirements: string;
   nonfunctionalRequirements: string;
+  //start business agent fields below
   valuePropositions: string;
   channels: string;
   revenueStreams: string;
@@ -56,19 +57,47 @@ const ProductViability = () => {
   ];
   // Determine which sections to show based on the active tab
   const sections = activeTab === "ProductRequirements" ? productSections : businessSections;
-
+  /*
+  // parse business agent data
+  useEffect(() => {
+    if (activeTab === "BusinessAnalysis" && !parsedProductData?.valuePropositions) {
+      // Fetch Business Model data only when switching to Business Analysis
+      fetch("/api/business_model")
+        .then(response => response.json())
+        .then(data => {
+          console.log("Fetched Business Model Data:", data);
+          setParsedProductData(prevData => ({
+            ...prevData,
+            ...data.result // Merge new Business Model data into existing product data
+          }));
+        })
+        .catch(error => console.error("Error fetching Business Model:", error));
+    }
+  }, [activeTab]);
+*/
   // parse product viability data
   useEffect(() => {
     if (data) {
       try {
         const parsedData = JSON.parse(decodeURIComponent(data));
 
-        if (typeof parsedData.result === "string") {
-          parsedData.result = JSON.parse(parsedData.result);
+        //check for existence
+        if (typeof parsedData.viability_result === "string") {
+          parsedData.viability_result = JSON.parse(parsedData.viability_result);
+        }
+        if (typeof parsedData.business_result === "string") {
+          parsedData.business_result = JSON.parse(parsedData.business_result);
         }
   
-        console.log("Parsed PRD:", parsedData);
-        setParsedProductData(parsedData.result);
+        console.log("Parsed PRD:", parsedData.viability_result);
+        console.log("Parsed Business Model:", parsedData.business_result);
+
+        // merge both viability & business model data in one state
+      setParsedProductData(prevData => ({
+        ...prevData,
+        ...parsedData.viability_result, // Store Viability Agent data
+        ...parsedData.business_result // Store Business Model Agent data
+      }));
 
       } catch (error) {
         console.error("Error parsing data:", error);
