@@ -153,6 +153,33 @@ const ProductViability = () => {
     }
   };
 
+  const handleProceedToSWEAgent = async () => {
+    setLoading(true); // Start loading indicator
+
+    try {
+      const response = await fetch("/api/swe_model", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: 'generate' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to trigger MVP generation');
+      }
+
+      // MVP generation triggered, now navigate to SWE Agent page
+      router.push("/swe");
+
+    } catch (error) {
+      console.error("Error triggering MVP generation:", error);
+      alert("Failed to proceed to Software Engineering Agent. Please try again.");
+    } finally {
+      setLoading(false); // Stop loading indicator
+    }
+  };
+
   const getSectionData = (key: string): JSX.Element => {
     const validKey = key as keyof ProductData;
   
@@ -280,7 +307,8 @@ const ProductViability = () => {
           {/* Navigation Buttons */}
           <div className="navigation-buttons">
             <button onClick={handleBackToDesign}>Back to Design Thinking Agent</button>
-            <button onClick={() => router.push("/software_agent")}>Proceed to Software Engineering Agent</button>
+            {/* <button onClick={() => router.push("/generate_mvp")}>Proceed to Software Engineering Agent</button>  */}
+            <button onClick={handleProceedToSWEAgent}>Proceed to Software Engineering Agent</button> 
           </div>
         </>
       )}
