@@ -1,0 +1,588 @@
+/* Color Variables */
+.global-styles {
+    --primary-color: #0056b3;
+    --secondary-color: #00aaff;
+    --background-color: #222222;
+    --surface-color: #ffffff;
+    --text-color-primary: #ffffff;
+    --text-color-secondary: #cccccc;
+    --border-color: #dddddd;
+    --button-hover-color: #004094;
+
+  /* Base Styles */
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  html, body {
+    background-color: var(--background-color);
+    color: white;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .container {
+    min-height: 100vh;
+    min-width: 100%;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background-color);
+  }
+
+    
+  .header {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  h1, p {
+    color: white;
+  }
+
+  a {
+    color: var(--primary-color);
+    text-decoration: underline;
+    transition: color 0.3s ease;
+  }
+
+  a:hover {
+    color: var(--button-hover-color);
+  }
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--text-color-primary);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5em;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  h3 {
+    font-size: 1.75rem;
+  }
+
+  p {
+    color: var(--text-color-secondary);
+    margin-bottom: 1em;
+  }
+
+  /* Loading Overlay */
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(34, 34, 34, 0.8); /* --background-color, but with transparency */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-color-primary);
+    font-size: 1.5rem;
+    font-weight: bold;
+    z-index: 1000;
+    backdrop-filter: blur(5px); /* slight blur effect */
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  /* fade-in animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* pulse spinner effect oooh */
+  .loading-overlay::after {
+    content: "";
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--secondary-color);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 15px;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Button Styles */
+  button, .button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s;
+    text-decoration: none;
+  }
+
+  button:hover, .button:hover {
+    background-color: var(--button-hover-color);
+    transform: scale(1.05);
+  }
+
+  .button-secondary {
+    background-color: var(--secondary-color);
+    color: #ffffff;
+  }
+
+  .button-secondary:hover {
+    background-color: #0088cc;
+  }
+
+  /* Navbar Styles */
+  .navbar {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem 0;
+  }
+
+  .navbar a {
+    color: white;
+    padding-left: 1rem;
+    margin-right: 1.5rem;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    text-decoration: none;
+  }
+
+  .navbar a:hover {
+    color: var(--button-hover-color);
+    text-decoration: none;
+  }
+
+      
+  /* SWE agent*/
+  .swe-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 60rem;
+  }
+
+  /* swe card has a hover function */
+  .swe-card {
+    background-color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    color: white;
+  }
+  .swe-card:hover {
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    background-color: var(--button-hover-color);
+  }
+
+  .swe-card .cardTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color:white
+  }
+
+  .swe-card .cardText {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* SWE agent feature page */
+  /* .feature-card {
+    background-color: var(--surface-color);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .feature-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .feature-card .cardTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .feature-card .cardText {
+    color: var(--text-color-secondary);
+    margin-top: 10px;
+  } */
+  /* Features Section */
+  .features-section {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    color: black;
+  }
+
+  .features-section .feature-description p {
+    color: black;
+  }
+
+  /* Feature Card */
+  .feature-card {
+    background-color: #0057d9; /* Blue background */
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .feature-title {
+    color: rgb(255, 255, 255);
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  /* Description Box */
+  .feature-description {
+    background-color: rgb(236, 236, 236);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    color: rgb(0, 0, 0) !important;
+  }
+
+  /* SWE agent page layout */
+  .page-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    height: 100vh;
+  }
+
+  /* .container {
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: left;
+  } */
+
+  /* swe side navigation bar */
+  .sidenav {
+    width: 200px; /* Adjust width as needed */
+    padding: 20px;
+    height: 100vh; /* Full height */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center; /* Center vertically */
+    font-size: 1.25rem;
+  }
+
+  /* Product Ideation text area */
+  .textarea {
+    width: 600px;
+    max-width: 1000px;
+    height: 200px;
+    padding: 1rem;
+    font-size: 1.25rem;
+    border-radius: 0.25rem;
+    border: 1px solid #ccc;
+    margin-bottom: 1rem;
+  }
+
+  /* Subtitle Styles */
+  .subtitle {
+    color: #cccccc;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  /* Input Box */
+  .input-box, .form-control {
+    background-color: #f0f0f0;
+    border: 1px solid var(--border-color);
+    padding: 0.75rem;
+    width: 100%;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: #333333;
+  }
+
+  .input-box:focus, .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(0, 86, 179, 0.2);
+    outline: none;
+  }
+
+  /* Card and Form Styles */
+  .card {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .cardTitle {
+    color: #333333;
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  .cardText {
+    color: #676f7a;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  /* Utility Classes */
+  .text-center {
+    text-align: center;
+  }
+
+  .mb-1 { margin-bottom: 0.25rem; }
+  .mb-2 { margin-bottom: 0.5rem; }
+  .mb-3 { margin-bottom: 1rem; }
+  .mt-1 { margin-top: 0.25rem; }
+  .mt-2 { margin-top: 0.5rem; }
+  .mt-3 { margin-top: 1rem; }
+  .mt-8 { margin-top: 1rem; }
+  .pt-1 { padding-top: 0.25rem; }
+  .pt-2 { padding-top: 0.5rem; }
+  .pt-3 { padding-top: 1rem; }
+
+  /* Footer Styles */
+  .footer {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem 0;
+    text-align: center;
+  }
+
+  /* Empathy Map & Customer Journey Map Styles */
+  .empathy-map-container,
+  .journey-map-container {
+    width: 100%;
+    margin: 10px auto;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: var(--primary-color);
+    color: white;
+  }
+
+  .empathy-map-section h4,
+  .journey-map-section h4 {
+    color: var(--background-color);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .empathy-map-heading,
+  .journey-map-heading {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: var(--surface-color);
+  }
+
+  .empathy-map-grid,
+  .journey-map-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .empathy-map-section,
+  .journey-map-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: var(--surface-color);
+    color: var(--text-color-secondary);
+  }
+
+  .empathy-map-box,
+  .journey-map-box {
+    background-color: var(--secondary-color);
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 4px;
+    text-align: center;
+    color: white;
+  }
+
+  /* Flex container for side-by-side layout */
+  .flex-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  /* Sidebar Styling */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 180px;
+    margin-right: 10px;
+    margin-top: 10px;
+    max-height: 370px;
+    overflow-y: auto;
+    padding-left: 6px;
+    padding-right: 6px;
+    direction: rtl;
+  }
+
+  .sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .sidebar::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 3px;
+  }
+
+  .sidebar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .sidebar button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .sidebar button.active {
+    background-color: var(--button-hover-color);
+  }
+
+  .sidebar button:hover {
+    transform: scale(1.05);
+    background-color: #2f7ce2
+  }
+
+  /* Product Section Styles */
+  .product-section {
+    width: 700px;
+    min-height: 350px;
+    flex: 1;
+    margin: 10px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: var(--primary-color);
+    color: white;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: auto;
+  }
+
+  .product-section h2 {
+    color: var(--surface-color);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+
+  .product-section p {
+    background-color: var(--secondary-color);
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  /* Footer Buttons */
+  .footer-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .footer-buttons button {
+    background-color: var(--surface-color);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    border: 1px solid var(--primary-color);
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .footer-buttons button:hover {
+    background-color: var(--primary-color);
+    color: var(--surface-color);
+    transform: scale(1.05);
+  }
+
+  /* Navigation Buttons (btwn agents) */
+  .navigation-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .navigation-buttons button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .navigation-buttons button:hover {
+    background-color: var(--button-hover-color);
+    transform: scale(1.05);
+  }
+}
