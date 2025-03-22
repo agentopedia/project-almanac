@@ -23,7 +23,7 @@ class SWESystemAgent(Agent):
         4. Connect to the existing Flask backend via API endpoints
 
         Technical Requirements:
-        1. The primary endpoint for API communication is '/api/swe_model' which should be used for form submissions and button clicks
+        1. The primary endpoint for API communication is '/swe_model' which should be used for form submissions and button clicks
         2. All components should make fetch requests to send/receive data from the Flask backend
         3. Implement proper error handling for API requests
         4. Create responsive designs that work on mobile and desktop
@@ -44,9 +44,9 @@ class SWESystemAgent(Agent):
         5. Provide clear component structure with proper imports and exports
         6. Components should be compatible with Next.js 13+ app directory structure
         7. Do not generate jsx codeticks.
-        8. Ensure that all the buttons in the page are making a call to the route named '/model'. Clicking on this button should pass the arguments as input to the route. 
-        9. Do not output the plan or the PRD
-        10. Do not generate images. 
+        8. Ensure that all the buttons in the page are making a call to the route named '/swe_model'. Clicking on this button should pass the arguments as input to the route. 
+        9. Do not output the plan or the PRD.
+        10. Do not generate any images at all. 
         11. Never use placeholder texts as examples. Always approximate the real-world scenarios as examples based on the context of the webpage.
 
         API Communication:
@@ -55,6 +55,9 @@ class SWESystemAgent(Agent):
         3. Handle responses properly with loading states and error handling
         4. All form submissions should be directed to the appropriate API endpoint
         
+        The following examples show how to capture different types of user input and make POST requests to the /swe_model route. These examples are just meant to help you 
+        understand how a component communicates with the Flask backend. Do not generate these examples as verbatim, just understand how everything is being processed.
+
         Example 1: Let's assume the description is for a contact form with fields for name, email, and message, along with a submit button that makes a call to the /swe_model route.
         Here's a very basic example of a React component that communicates with the Flask backend:
 
@@ -138,7 +141,7 @@ class SWESystemAgent(Agent):
                 </div>
                 
                 <div className="form-group mb-3">
-                <label htmlFor="message">Message</label>
+                <label htmlFor="xamessage">Message</label>
                 <textarea
                     className="form-control"
                     id="message"
@@ -553,13 +556,13 @@ class SWESystemAgent(Agent):
         }};
 
         export default AppointmentForm;
+        
+        Now that you have a grasp on handling user input, augment the final generated code following the below guidelines:
 
-        These examples cover various types of forms, each designed to capture different types of user input and make POST requests to the /swe_model route. This should provide a clear template for generating similar Bootstrap forms for other use cases.
-
-        Augment the final generated code with the below guidelines:
-
-        Design a dynamic, responsive web application using Bootstrap that incorporates a variety of layouts, components, and design patterns available in the framework. Do not use the default blue color to render the buttons. Use different colors based on 
-        the theme of the application that is getting built. This application should contain:
+        Design a dynamic, responsive web application using Bootstrap that incorporates a variety of layouts, components, and design patterns available in the framework. 
+        Do not use the default blue color to render the buttons. Use different colors based on the theme of the application that is getting built. 
+        
+        This application should contain:
 
         Diverse Layouts:
 
@@ -610,7 +613,9 @@ class SWESystemAgent(Agent):
         4. Make API calls to Flask endpoints correctly
         5. Follow responsive design principles with Bootstrap
 
-        Your goal is to generate a comprehensive MVP that addresses all requirements in the PRD while being creative, functional, and error-free.
+        Your ultimate goal is to generate a comprehensive MVP that addresses all requirements in the PRD while being creative, functional, and error-free. Do not generate 
+        the provided examples. They are just meant to show you how to foster component-backend communication, which will be needed throughout the MVP. Ensure that you 
+        generate a complete React component with a single 'export default' statement.
         """
 
         super().__init__(model, tools, prompt)
