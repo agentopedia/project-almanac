@@ -1,10 +1,14 @@
 from flask import Flask, request, jsonify
+
 from design_agent import DesignThinkingAgent
+from business_model_agent import BusinessModelAgent
 from viability_agent import ProductViabilityAgent
 from swe_agent import SWESystemAgent
-from business_model_agent import BusinessModelAgent
+from swe_verifier_agent import SWEVerifierAgent
+
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.tools.tavily_search import TavilySearchResults
+
 import json5
 import json
 import os
@@ -25,6 +29,7 @@ design = DesignThinkingAgent(model, tools)
 viability = ProductViabilityAgent(model, tools)
 business = BusinessModelAgent(model, tools)
 swe = SWESystemAgent(model, tools)
+verifier = SWEVerifierAgent(model, tools)
 
 @app.route('/design_input', methods=['POST'])
 def run_agent():
@@ -113,20 +118,26 @@ def generate_mvp():
     if (swe.last_message == ""):
         result = swe.run(json.dumps(data))
         result = result['messages'][-1].content
-        swe.last_message = result
 
-        cleanedResult = re.sub(r'`(?:jsx|css|javascript)?\n?', '', result) # Remove `jsx, `css, `javascript, and ``` (with optional newline after)
-        cleanedResult = re.sub(r'`', '', cleanedResult) # Remove any remaining `
-        # cleanedResult = re.sub(r'//.*', '', cleanedResult) # Remove single-line JavaScript comments (// ...)
-        cleanedResult = cleanedResult.strip() # Trim whitespace
-
-        swe.last_message = cleanedResult
-        result = cleanedResult
+        verifiedCode = verifier.run(result)
+        swe.last_message = verifiedCode
+        result = verifiedCode
     else:
         result = swe.last_message
-        
-    response = {"message": "MVP generated successfully", "result": result}
-    print(response)
+    
+    cwd = os.getcwd() 
+    filePath = os.path.join(cwd, '..', 'app', 'generatedmvp', 'page.tsx')
+
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(filePath), exist_ok = True)
+    
+    with open(filePath, 'w') as f:
+        f.write(result)
+
+    response = {
+        "message": "MVP generated, verified, and saved successfully.", 
+        "result": result
+    }
     return jsonify(response), 200
 
 def findFreePort():
