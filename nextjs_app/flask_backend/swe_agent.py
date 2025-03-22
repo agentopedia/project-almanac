@@ -613,9 +613,10 @@ class SWESystemAgent(Agent):
         4. Make API calls to Flask endpoints correctly
         5. Follow responsive design principles with Bootstrap
 
-        Your ultimate goal is to generate a comprehensive MVP that addresses all requirements in the PRD while being creative, functional, and error-free. Do not generate 
+        Your ultimate goal is to generate a comprehensive MVP that addresses all requirements in the PRD. Do not generate 
         the provided examples. They are just meant to show you how to foster component-backend communication, which will be needed throughout the MVP. Ensure that you 
-        generate a complete React component with a single 'export default' statement.
+        generate a complete React component with a single 'export default' statement. This component should include all the different CUJs that are possible while 
+        being creative, functional, and error-free.
         """
 
         super().__init__(model, tools, prompt)
