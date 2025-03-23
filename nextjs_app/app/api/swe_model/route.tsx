@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 const dataFilePath = path.join(process.cwd(), 'data', 'sweOutput.json');
+const generatedMVPPath = path.join(process.cwd(), '..', '..', 'generatedmvp', 'page.tsx');
 
 function getAlmanacPortFromFile(): string | null {
   try {
@@ -20,8 +21,17 @@ function getAlmanacPortFromFile(): string | null {
 function saveSweOutput(data: any) {
   try {
     fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+    fs.writeFileSync(generatedMVPPath, data)
   } catch (error) {
     console.error("Error saving SWE output:", error);
+  }
+}
+
+function saveMVPPage(pageData: string) {
+  try {
+    fs.writeFileSync(generatedMVPPath, pageData)
+  } catch (error) {
+    console.error("Error saving MVP page:", error);
   }
 }
 
@@ -38,17 +48,32 @@ function getSweOutputFromFile() {
   }
 }
 
+function getCurrentMVPPage(): string | null {
+  try {
+    if (fs.existsSync(generatedMVPPath)) {
+      return fs.readFileSync(generatedMVPPath, 'utf-8');
+    }
+    return null;
+  } catch (error) {
+    console.error("Error reading MVP page:", error);
+    return null;
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const { action, data } = await req.json();
+    const requestData = await req.json();
+    const { action, buttonName, formData } = requestData;
     const port = getAlmanacPortFromFile();
     
     if (!port) {
       return NextResponse.json({ error: "Could not determine Flask port" }, { status: 500 });
     }
 
+    const currentPageContent = getCurrentMVPPage();
+
     // Different actions the SWE agent can perform
-    switch (action) {
+    switch (action || 'navigate') {
       case 'generate':
         // Generate product UI based on PRD
         const flaskResponse = await fetch(`http://localhost:${port}/generate_mvp`, {
@@ -64,23 +89,60 @@ export async function POST(req: NextRequest) {
         
         const responseData = await flaskResponse.json();
         saveSweOutput(responseData.result);
+        
+        if (responseData.result?.pageContent) {
+          saveMVPPage(responseData.result.pageContent); // Save the initial page content.
+        }
+
         return NextResponse.json({ 
           message: 'SWE agent generated product successfully', 
           result: responseData.result 
         });
-        
+      
+      case 'navigate':
+        const navigationPayload = {
+          currentPage: currentPageContent,
+          buttonName: buttonName,
+          formData: formData || {},
+        };
+
+        const navResponse = await fetch(`http://localhost:${port}/generate_context_page`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json' 
+          },
+          body: JSON.stringify(navigationPayload)
+        });
+
+        if (!navResponse.ok) {
+          return NextResponse.json(
+            { error: 'Error from Flask server while generating context page' }, 
+            { status: navResponse.status }
+          );
+        }
+
+        const navData = await navResponse.json()
+        if (navData.result?.pageContent) {
+          saveMVPPage(navData.result.pageContent); // Save the newly generated page.
+        }
+
+        return NextResponse.json({ 
+          message: 'Generated new context page successfully', 
+          result: navData.result 
+        });
+
       case 'customize':
         // Customize existing product (for future implementation)
-        if (!data) {
+        if (!requestData.data) {
           return NextResponse.json({ error: "No customization data provided" }, { status: 400 });
         }
         
         // This would call a customization endpoint on the Flask backend
         // For now, we'll just save the customized data
-        saveSweOutput(data);
+        saveSweOutput(requestData.data);
         return NextResponse.json({ 
           message: 'Product customized successfully', 
-          result: data 
+          result: requestData.data 
         });
         
       default:
@@ -94,8 +156,9 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   const sweOutput = getSweOutputFromFile();
+  const currentPage = getCurrentMVPPage();
   
-  if (!sweOutput) {
+  if (!sweOutput || !currentPage) {
     // If no SWE output exists yet, trigger the Flask endpoint to generate it
     try {
       const port = getAlmanacPortFromFile();
@@ -103,7 +166,7 @@ export async function GET() {
         return NextResponse.json({ error: "Could not determine Flask port" }, { status: 500 });
       }
       
-      const flaskResponse = await fetch(`http://localhost:${port}/swe_model`, {
+      const flaskResponse = await fetch(`http://localhost:${port}/generate_mvp`, {
         method: 'GET'
       });
       
@@ -116,12 +179,23 @@ export async function GET() {
       
       const responseData = await flaskResponse.json();
       saveSweOutput(responseData.result);
-      return NextResponse.json({ result: responseData.result });
+
+      if (responseData.result?.pageContent) {
+        saveMVPPage(responseData.result.pageContent); // Save the initial page content.
+      }
+      
+      return NextResponse.json({ 
+        result: responseData.result,
+        currentPage: responseData.result?.pageContent 
+      });
     } catch (error) {
       console.error("Error fetching from Flask:", error);
       return NextResponse.json({ error: "Could not generate SWE output" }, { status: 500 });
     }
   }
   
-  return NextResponse.json({ result: sweOutput });
+  return NextResponse.json({ 
+    result: sweOutput,
+    currentPage: currentPage 
+  });
 }
