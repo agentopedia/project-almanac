@@ -49,11 +49,10 @@ class SWESystemAgent(Agent):
         7. Do not generate jsx codeticks.
         8. Ensure that all the buttons in the page are making a call to the route named '/api/swe_model'. Clicking on this button should pass the arguments as input to the route. 
         9. Do not output the plan or the PRD.
-        10. Do not generate any images at all. 
-        11. Never use placeholder texts as examples. Always approximate the real-world scenarios as examples based on the context of the webpage. Where applicable,
-            enter accessible images/links. These images/links MUST render.
-        12. Do not use any template literals. This means no '$' should be present in the generated code.
-        13. All router.push() calls should navigate to the /swe route."
+        10. Never use placeholder texts/images/urls as examples. Always approximate the real-world scenarios as examples based on the context of the webpage. Every image and url
+            must be accessible, meaning if a user would enter the url into the browser they can access it without 404 errors and it is available.  
+        11. Do not use any template literals, which are strings containing the '$' character. Instead, use string concatenation.
+        12. All router.push() calls should navigate to the /swe route."
 
         API Communication:
         1. Use fetch API for making requests to the backend
@@ -297,7 +296,7 @@ class SWESystemAgent(Agent):
 
         export default NavigationExample;
 
-        Now that you have a grasp on handling user input, ensure the final generated code should follow the below guidelines:
+        Now that you have a grasp on handling user input with handle functions, ensure the final generated code should follow the below guidelines:
 
         Design a dynamic, responsive web application using Bootstrap that incorporates a variety of layouts, components, and design patterns available in the framework. 
         Do not use the default blue color to render the buttons. Use different colors based on the theme of the application that is getting built. 
@@ -357,7 +356,12 @@ class SWESystemAgent(Agent):
         the provided examples. They are just meant to show you how to foster component-backend communication, which will be needed throughout the MVP. Ensure that you 
         generate a complete React component with a single 'export default' statement. This component should include all the different CUJs that are possible while 
         being creative, functional, and error-free. Further, the only action value permitted when making POST requests to the /api/swe_model endpoint is 'navigate'. 
-        All other actions are forbidden. Ensure that every fetch call to this endpoint includes action: 'navigate', along with the buttonName and formData."
+        All other actions are forbidden. Ensure that every fetch call to this endpoint includes action: 'navigate', along with the buttonName and formData." Most importantly, 
+        NEVER use any placeholders, whether that is for images, text, links, urls, etc. Always approximate real-world scenarios using information from your knowledge base. 
+        For any images, urls, these must be accessible and viewable by the user. Notice how "https://www.formula1.com/content/dam/fom-website/drivers/L/LEWHAM01_Lewis_Hamilton/lewham01.png.transform/2col-retina/image.png",
+        https://react-bootstrap.netlify.app/ can be pasted into the browser and the image renders? Any other image, url should follow the same behavior. Youtube Links should 
+        be of the form "https://www.youtube.com/results?search_query=your query". Do not use wikimedia, freepik, unsplash for images. 
+        Finally, make sure the next page is only generated once a user's interaction is indicative of continuing the CUJ (a button click, form submission, etc.). 
         """
 
         super().__init__(model, tools, self.prompt)
@@ -397,15 +401,18 @@ class SWESystemAgent(Agent):
         
         - Form data: {json.dumps(formData, indent = 2)}
 
-        Understand what this page is describing by extracting all its text contents and referring to the PRD. 
-        Then, generate the next page based on this context alongside the buttonName + formData to understand 
+        Understand what this page is describing by extracting all its text contents and referring to the {self.prd_content}
+        to understand the global context of this page. Then, review the code to determine where the user
+        interaction exists (button press) and the context alongside that (class contents - review the divs) to understand 
         the current position in the CUJ following the aforementioned requirements. 
 
         If there is not much context to use, then be creative. As an example, if the current page is a form
-        asking to input details for an airplane specification, then the next page should provide an extensive
-        overview of that airplane. Do NOT generate an airplane specification page verbatim. Review the context by
-        referring to the PRD, and generate the new page in accordance with the user's app. If the current code 
-        is a form, the generated output should not be a form.
+        asking to input details for some specification, then the next page should provide an extensive
+        overview of that specification. Do NOT generate a specification page because of this example. This was
+        just to help you understand how to continue the application flow.
+        
+        Always review the global context by referring to the {self.prd_content}, and generate the new page in accordance with the user's app. 
+        If the current code is a form, the generated output should not be a form.
 
         The response should be a fully functional React component that handles the next step in the user journey.
         Ensure the component has proper navigation and state management to handle further user interactions.
