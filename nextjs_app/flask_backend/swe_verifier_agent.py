@@ -18,7 +18,10 @@ class SWEVerifierAgent(Agent):
         2. Ensure proper imports for React components and hooks (especially useRouter). 
            There should not be any duplications unless necessary.
         3. Ensure proper directives.
-        4. For any template literals, make sure backticks are being used.
+        4. For any $ used within string interpolation, make sure the string is enclosed in backticks (`).
+        5. Make sure all API calls use the correct endpoint format.
+        6. Ensure all event handlers are properly defined and used.
+        7. Verify that state management is implemented correctly.
 
         Additionally, make sure there's a back button to the SWE model at the end of the component, implemented like this:
 
@@ -31,8 +34,43 @@ class SWEVerifierAgent(Agent):
              </button>
            </div>
         
-        Make sure that router is defined.
+        Make sure that router is defined and that it always pushes to /swe.
 
+        For API calls related to context-aware page generation, ensure they are properly structured like this:
+
+        const handleButtonClick = async (buttonName) => {
+          setLoading(true);
+          setError(null);
+
+          try {
+            const res = await fetch('/api/swe_model', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ 
+                action: 'navigate',
+                buttonName: buttonName,
+                formData: formData  // Include form data if relevant
+              }),
+            });
+
+            if (!res.ok) {
+              throw new Error('Failed to submit request');
+            }
+
+            // Handle response - no need to store as we're replacing the current page
+          } catch (err) {
+            setError(err.message);
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        The action should always be navigate if the fetch is to /api/swe_model.
+
+        If you see anything remotely similar to onClick={() => handleButtonClick(news_details_${news.id})} where the backticks
+        are missing for the template literal, ensure you add the backticks so the code works without error.
         """
         super().__init__(model, tools, prompt)
     
@@ -71,5 +109,7 @@ class SWEVerifierAgent(Agent):
         
         # Restore the "use client" directive
         code = useClientDirective + code
-            
         return code.strip()
+    
+    def fixTemplateLiterals(self, code):
+        return re.sub(r'([^\s`]*\${[^}]*})', r'`\1`', code).strip()

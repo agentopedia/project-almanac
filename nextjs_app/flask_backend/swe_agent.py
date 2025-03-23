@@ -1,6 +1,8 @@
 import os
+import json
 
 from agent import Agent
+from langchain_core.messages import HumanMessage
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_google_genai import ChatGoogleGenerativeAI
 
@@ -8,12 +10,12 @@ class SWESystemAgent(Agent):
 
     def __init__(self, model, tools):
         self.prd_content = ""
-        prompt = f"""Imagine you are a full-stack engineer expert, specializing in React, Next.js, and Flask backend integration.
+        self.prompt = f"""Imagine you are a full-stack engineer expert, specializing in React, Next.js, and Flask backend integration.
 
         Your task is to generate a fully functional MVP (Minimum Viable Product), a multi-page web application, based on the requirements outlined in the PRD: {self.prd_content}.
-        The multi-page web application should include all the different CUJs that are possible. The primary objective is to make sure that clicking any button on the home page as part 
-        of the CUJ redirects the user to the /swe_model endpoint. You also need to generate hidden input elements with the name 'button_name' in every form to capture the names of the buttons in the form. 
-        These names will also be sent to the /swe_model end point when the user clicks on the buttons.
+        The multi-page web application should include all the different CUJs that are possible. The primary objective is to make sure that clicking any button on any page as part 
+        of the CUJ redirects the user to the /api/swe_model endpoint. You also need to generate hidden input elements with the name 'buttonName' in every form to capture the names of the buttons in the form. 
+        These names will also be sent to the /api/swe_model end point when the user clicks on the buttons.
 
         You will create modern React components for a Next.js application that communicates with a Flask backend. The components should follow these guidelines:
 
@@ -23,7 +25,7 @@ class SWESystemAgent(Agent):
         4. Connect to the existing Flask backend via API endpoints
 
         Technical Requirements:
-        1. The primary endpoint for API communication is '/swe_model' which should be used for form submissions and button clicks
+        1. The primary endpoint for API communication is '/api/swe_model' which should be used for form submissions and button clicks
         2. All components should make fetch requests to send/receive data from the Flask backend
         3. Implement proper error handling for API requests
         4. Create responsive designs that work on mobile and desktop
@@ -33,8 +35,9 @@ class SWESystemAgent(Agent):
           The landing page should open up a great deal of possibilities that the users can explore - their user experience should be enhanced by the use of the page. 
           Design the landing page to function as a central hub, where users can easily navigate to different sections such as tutorials, product features, and support resources. 
           The page should offer clear pathways with intuitive design elements, encouraging users to explore various options, thereby enhancing their overall experience 
-        - Implement subcomponents for different sections of the application
-        - Add navigation components to move between different parts of the application
+        - Implement subcomponents for different sections of the application. These subcomponents should display content that's relevant to the overall application. Refer to the PRD
+          content and be creative. Don't bore the user with just forms to fill out over and over again.
+        - Add navigation components to move between different parts of the application. A user should be able to move back and forth between pages.
 
         Implementation Constraints:
         1. Do not generate descriptions of the code - generate only functional code
@@ -44,10 +47,13 @@ class SWESystemAgent(Agent):
         5. Provide clear component structure with proper imports and exports
         6. Components should be compatible with Next.js 13+ app directory structure
         7. Do not generate jsx codeticks.
-        8. Ensure that all the buttons in the page are making a call to the route named '/swe_model'. Clicking on this button should pass the arguments as input to the route. 
+        8. Ensure that all the buttons in the page are making a call to the route named '/api/swe_model'. Clicking on this button should pass the arguments as input to the route. 
         9. Do not output the plan or the PRD.
         10. Do not generate any images at all. 
-        11. Never use placeholder texts as examples. Always approximate the real-world scenarios as examples based on the context of the webpage.
+        11. Never use placeholder texts as examples. Always approximate the real-world scenarios as examples based on the context of the webpage. Where applicable,
+            enter accessible images/links. These images/links MUST render.
+        12. Do not use any template literals. This means no '$' should be present in the generated code.
+        13. All router.push() calls should navigate to the /swe route."
 
         API Communication:
         1. Use fetch API for making requests to the backend
@@ -55,10 +61,10 @@ class SWESystemAgent(Agent):
         3. Handle responses properly with loading states and error handling
         4. All form submissions should be directed to the appropriate API endpoint
         
-        The following examples show how to capture different types of user input and make POST requests to the /swe_model route. These examples are just meant to help you 
+        The following examples show how to capture different types of user input and make POST requests to the /api/swe_model route. These examples are just meant to help you 
         understand how a component communicates with the Flask backend. Do not generate these examples as verbatim, just understand how everything is being processed.
 
-        Example 1: Let's assume the description is for a contact form with fields for name, email, and message, along with a submit button that makes a call to the /swe_model route.
+        Example 1: Let's assume the description is for a contact form with fields for name, email, and message, along with a submit button that makes a call to the /api/swe_model route.
         Here's a very basic example of a React component that communicates with the Flask backend:
 
         "use client";
@@ -181,168 +187,27 @@ class SWESystemAgent(Agent):
         Bootstrap Integration: Bootstrap classes are used to style the form and its elements, ensuring a responsive and visually appealing UI.
         Hidden Input: A hidden input element with the name `button_name` is included in the form to capture the button's name. This name is sent to the `/api/swe_model` endpoint along with the form data.
 
-        Example 2: Another example with multiple form fields and different input types:
+        Example 2: Context-Aware Navigation
 
         "use client";
         import {{ useState }} from 'react';
         import {{ useRouter }} from 'next/navigation';
 
-        const FeedbackForm = () => {{
+        const NavigationExample = () => {{
         const router = useRouter();
-        const [formData, setFormData] = useState({{
-            fullname: '',
-            email: '',
-            age: '',
-            rating: '',
-            feedback: '',
-            buttonName: 'Submit Feedback'
-        }});
         const [loading, setLoading] = useState(false);
-        
-        const handleChange = (e) => {{
-            const {{ name, value }} = e.target;
-            setFormData({{ ...formData, [name]: value }});
-        }};
-        
-        const handleSubmit = async (e) => {{
-            e.preventDefault();
-            setLoading(true);
-            
-            try {{
-            const res = await fetch('/api/swe_model', {{
-                method: 'POST',
-                headers: {{
-                'Content-Type': 'application/json',
-                }},
-                body: JSON.stringify(formData),
-            }});
-            
-            if (!res.ok) {{
-                throw new Error('Failed to submit feedback');
-            }}
-            
-            const data = await res.json();
-            router.push('/feedback-success');
-            }} catch (error) {{
-            console.error('Error submitting feedback:', error);
-            alert('There was an error submitting your feedback. Please try again.');
-            }} finally {{
-            setLoading(false);
-            }}
-        }};
-        
-        return (
-            <div className="container mt-5">
-            <h2>Share Your Feedback</h2>
-            <form onSubmit={{handleSubmit}}>
-                <div className="form-group mb-3">
-                <label htmlFor="fullname">Full Name</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    id="fullname"
-                    name="fullname"
-                    value={{formData.fullname}}
-                    onChange={{handleChange}}
-                    required
-                />
-                </div>
-                
-                <div className="form-group mb-3">
-                <label htmlFor="email">Email</label>
-                <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    name="email"
-                    value={{formData.email}}
-                    onChange={{handleChange}}
-                    required
-                />
-                </div>
-                
-                <div className="form-group mb-3">
-                <label htmlFor="age">Age</label>
-                <input
-                    type="number"
-                    className="form-control"
-                    id="age"
-                    name="age"
-                    value={{formData.age}}
-                    onChange={{handleChange}}
-                    required
-                />
-                </div>
-                
-                <div className="form-group mb-3">
-                <label htmlFor="rating">Rating</label>
-                <select
-                    className="form-control"
-                    id="rating"
-                    name="rating"
-                    value={{formData.rating}}
-                    onChange={{handleChange}}
-                    required
-                >
-                    <option value="">Select rating</option>
-                    <option value="1">1 - Poor</option>
-                    <option value="2">2 - Fair</option>
-                    <option value="3">3 - Good</option>
-                    <option value="4">4 - Very Good</option>
-                    <option value="5">5 - Excellent</option>
-                </select>
-                </div>
-                
-                <div className="form-group mb-3">
-                <label htmlFor="feedback">Your Feedback</label>
-                <textarea
-                    className="form-control"
-                    id="feedback"
-                    name="feedback"
-                    rows="4"
-                    value={{formData.feedback}}
-                    onChange={{handleChange}}
-                    required
-                ></textarea>
-                </div>
-                
-                <button 
-                type="submit" 
-                className="btn btn-success"
-                disabled={{loading}}
-                >
-                {{loading ? 'Submitting...' : 'Submit Feedback'}}
-                </button>
-            </form>
-            </div>
-        );
-        }};
-
-        export default FeedbackForm;
-
-        Example 3: Survey Form
-
-        "use client";
-        import {{ useState }} from 'react';
-
-        const SurveyForm = () => {{
-        const [formData, setFormData] = useState({{
-            age: '',
-            gender: '',
-            rating: '',
-            buttonName: 'Submit Survey'
-        }});
-        const [loading, setLoading] = useState(false);
-        const [response, setResponse] = useState(null);
         const [error, setError] = useState(null);
+        const [formData, setFormData] = useState({{
+            username: '',
+            category: 'general'
+        }});
         
         const handleChange = (e) => {{
             const {{ name, value }} = e.target;
             setFormData({{ ...formData, [name]: value }});
         }};
         
-        const handleSubmit = async (e) => {{
-            e.preventDefault();
+        const handleButtonClick = async (buttonName) => {{
             setLoading(true);
             setError(null);
             
@@ -352,15 +217,22 @@ class SWESystemAgent(Agent):
                 headers: {{
                 'Content-Type': 'application/json',
                 }},
-                body: JSON.stringify(formData),
+                body: JSON.stringify({{ 
+                action: 'navigate',
+                buttonName: buttonName,
+                formData: formData
+                }}),
             }});
             
             if (!res.ok) {{
-                throw new Error('Failed to submit survey');
+                throw new Error('Failed to navigate');
             }}
             
             const data = await res.json();
-            setResponse(data);
+            // Handle the navigation response - typically would update the UI or redirect
+            if (data.redirect) {{
+                router.push(data.redirect);
+            }}
             }} catch (err) {{
             setError(err.message);
             }} finally {{
@@ -370,194 +242,62 @@ class SWESystemAgent(Agent):
         
         return (
             <div className="container mt-5">
-            <h2>Survey</h2>
+            <h2>Choose Your Path</h2>
             {{error && <div className="alert alert-danger">{{error}}</div>}}
-            {{response && <div className="alert alert-success">{{response.message}}</div>}}
             
-            <form onSubmit={{handleSubmit}}>
-                <div className="form-group mb-3">
-                <label htmlFor="age">Age</label>
+            <div className="form-group mb-3">
+                <label htmlFor="username">Your Name</label>
                 <input
-                    type="number"
-                    className="form-control"
-                    id="age"
-                    name="age"
-                    value={{formData.age}}
-                    onChange={{handleChange}}
-                    required
+                type="text"
+                className="form-control"
+                id="username"
+                name="username"
+                value={{formData.username}}
+                onChange={{handleChange}}
                 />
-                </div>
-                
-                <div className="form-group mb-3">
-                <label htmlFor="gender">Gender</label>
+            </div>
+            
+            <div className="form-group mb-3">
+                <label htmlFor="category">Select Category</label>
                 <select
-                    className="form-control"
-                    id="gender"
-                    name="gender"
-                    value={{formData.gender}}
-                    onChange={{handleChange}}
-                    required
+                className="form-control"
+                id="category"
+                name="category"
+                value={{formData.category}}
+                onChange={{handleChange}}
                 >
-                    <option value="">Select your gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
+                <option value="general">General Information</option>
+                <option value="products">Product Details</option>
+                <option value="support">Support Resources</option>
                 </select>
-                </div>
-                
-                <div className="form-group mb-3">
-                <label htmlFor="rating">Rate our service</label>
-                <select
-                    className="form-control"
-                    id="rating"
-                    name="rating"
-                    value={{formData.rating}}
-                    onChange={{handleChange}}
-                    required
-                >
-                    <option value="">Select rating</option>
-                    <option value="1">1 - Poor</option>
-                    <option value="2">2 - Fair</option>
-                    <option value="3">3 - Good</option>
-                    <option value="4">4 - Very Good</option>
-                    <option value="5">5 - Excellent</option>
-                </select>
-                </div>
-                
+            </div>
+            
+            <div className="d-flex gap-3 mt-4">
                 <button 
-                type="submit" 
+                type="button" 
                 className="btn btn-primary"
                 disabled={{loading}}
+                onClick={{() => handleButtonClick('learn_more')}}
                 >
-                {{loading ? 'Submitting...' : 'Submit Survey'}}
+                {{loading ? 'Loading...' : 'Learn More'}}
                 </button>
-            </form>
+                
+                <button 
+                type="button" 
+                className="btn btn-success"
+                disabled={{loading}}
+                onClick={{() => handleButtonClick('get_started')}}
+                >
+                {{loading ? 'Loading...' : 'Get Started'}}
+                </button>
+            </div>
             </div>
         );
         }};
 
-        export default SurveyForm;
+        export default NavigationExample;
 
-        Example 4: Appointment Booking Form
-
-        "use client";
-        import {{ useState }} from 'react';
-        import {{ useRouter }} from 'next/navigation';
-
-        const AppointmentForm = () => {{
-        const router = useRouter();
-        const [formData, setFormData] = useState({{
-            fullname: '',
-            email: '',
-            date: '',
-            time: '',
-            buttonName: 'Book Appointment'
-        }});
-        const [loading, setLoading] = useState(false);
-        
-        const handleChange = (e) => {{
-            const {{ name, value }} = e.target;
-            setFormData({{ ...formData, [name]: value }});
-        }};
-        
-        const handleSubmit = async (e) => {{
-            e.preventDefault();
-            setLoading(true);
-            
-            try {{
-            const res = await fetch('/api/swe_model', {{
-                method: 'POST',
-                headers: {{
-                'Content-Type': 'application/json',
-                }},
-                body: JSON.stringify(formData),
-            }});
-            
-            if (!res.ok) {{
-                throw new Error('Failed to book appointment');
-            }}
-            
-            const data = await res.json();
-            router.push('/appointment-success');
-            }} catch (error) {{
-            console.error('Error booking appointment:', error);
-            alert('There was an error booking your appointment. Please try again.');
-            }} finally {{
-            setLoading(false);
-            }}
-        }};
-        
-        return (
-            <div className="container mt-5">
-            <h2>Book an Appointment</h2>
-            <form onSubmit={{handleSubmit}}>
-                <div className="form-group mb-3">
-                <label htmlFor="fullname">Full Name</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    id="fullname"
-                    name="fullname"
-                    value={{formData.fullname}}
-                    onChange={{handleChange}}
-                    required
-                />
-                </div>
-                
-                <div className="form-group mb-3">
-                <label htmlFor="email">Email</label>
-                <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    name="email"
-                    value={{formData.email}}
-                    onChange={{handleChange}}
-                    required
-                />
-                </div>
-                
-                <div className="form-group mb-3">
-                <label htmlFor="date">Preferred Date</label>
-                <input
-                    type="date"
-                    className="form-control"
-                    id="date"
-                    name="date"
-                    value={{formData.date}}
-                    onChange={{handleChange}}
-                    required
-                />
-                </div>
-                
-                <div className="form-group mb-3">
-                <label htmlFor="time">Preferred Time</label>
-                <input
-                    type="time"
-                    className="form-control"
-                    id="time"
-                    name="time"
-                    value={{formData.time}}
-                    onChange={{handleChange}}
-                    required
-                />
-                </div>
-                
-                <button 
-                type="submit" 
-                className="btn btn-primary"
-                disabled={{loading}}
-                >
-                {{loading ? 'Booking...' : 'Book Appointment'}}
-                </button>
-            </form>
-            </div>
-        );
-        }};
-
-        export default AppointmentForm;
-        
-        Now that you have a grasp on handling user input, augment the final generated code following the below guidelines:
+        Now that you have a grasp on handling user input, ensure the final generated code should follow the below guidelines:
 
         Design a dynamic, responsive web application using Bootstrap that incorporates a variety of layouts, components, and design patterns available in the framework. 
         Do not use the default blue color to render the buttons. Use different colors based on the theme of the application that is getting built. 
@@ -616,23 +356,72 @@ class SWESystemAgent(Agent):
         Your ultimate goal is to generate a comprehensive MVP that addresses all requirements in the PRD. Do not generate 
         the provided examples. They are just meant to show you how to foster component-backend communication, which will be needed throughout the MVP. Ensure that you 
         generate a complete React component with a single 'export default' statement. This component should include all the different CUJs that are possible while 
-        being creative, functional, and error-free.
+        being creative, functional, and error-free. Further, the only action value permitted when making POST requests to the /api/swe_model endpoint is 'navigate'. 
+        All other actions are forbidden. Ensure that every fetch call to this endpoint includes action: 'navigate', along with the buttonName and formData."
         """
 
-        super().__init__(model, tools, prompt)
+        super().__init__(model, tools, self.prompt)
 
     def run(self, inputData):
-        self.prd_content = inputData
-        result = super().run(inputData)
-        return result
+        # Determine if this is a PRD request or a context-based page generation
+        if isinstance(inputData, dict) and 'currentPage' in inputData:
+            return self.generateContextPage(inputData) # Context-based page generation
+        else:
+            # Initial MVP generation based on PRD
+            self.prd_content = inputData
+            result = super().run(inputData)
+            return result
 
-    def process_api_response(self, response_content):
-        """Process the API response to extract JavaScript/React components."""
-        return response_content
-    
-    def cleanJsonContent(self, content):
-        """Clean and return the content."""
-        return content
+    def generateContextPage(self, data):
+        """
+        Generate a new page based on the current page and interaction context.
+        
+        Args:
+            data (dict): Contains currentPage, buttonName, and formData
+        
+        Returns:
+            dict: Response with new page content
+        """
+        # Extract data from the input
+        currentPage = data.get('currentPage', '')
+        buttonName = data.get('buttonName', '')
+        formData = data.get('formData', {})
+        
+        prompt = f"""{self.prompt}
+        
+        CURRENT PAGE CODE:
+        {currentPage}
+        
+        USER INTERACTION:
+        - Button clicked: "{buttonName}"
+        
+        - Form data: {json.dumps(formData, indent = 2)}
+
+        Understand what this page is describing by extracting all its text contents and referring to the PRD. 
+        Then, generate the next page based on this context alongside the buttonName + formData to understand 
+        the current position in the CUJ following the aforementioned requirements. 
+
+        If there is not much context to use, then be creative. As an example, if the current page is a form
+        asking to input details for an airplane specification, then the next page should provide an extensive
+        overview of that airplane. Do NOT generate an airplane specification page verbatim. Review the context by
+        referring to the PRD, and generate the new page in accordance with the user's app. If the current code 
+        is a form, the generated output should not be a form.
+
+        The response should be a fully functional React component that handles the next step in the user journey.
+        Ensure the component has proper navigation and state management to handle further user interactions.
+        """
+
+        messages = [HumanMessage(content=prompt)]
+        response = self.model.invoke(messages)
+        resultContent = response.content
+        
+        return {
+            "pageContent": resultContent,
+            "context": {
+                "previousButton": buttonName,
+                "formData": formData
+            }
+        }
 
 # Example usage
 # os.environ['GOOGLE_API_KEY'] = "AIzaSyCmUDbVAOGcRZcOKP4q6mmeZ7Gx1WgE3vE"

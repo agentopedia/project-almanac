@@ -14,6 +14,7 @@ import json
 import os
 import socket
 import re
+import traceback
 
 os.environ['GOOGLE_API_KEY'] = "AIzaSyCcN7Yo1ONOFYn5wCzPcBxTXfk7wyUFlko"
 gemini_api_key = os.getenv("GOOGLE_API_KEY")
@@ -113,32 +114,64 @@ def swe_model_endpoint():
 @app.route('/generate_mvp', methods=['GET'])
 def generate_mvp():
     # Endpoint to generate the MVP code based on PRD
-    data = json5.loads(viability.last_message)
+    try:
+        data = json5.loads(viability.last_message)
     
-    if (swe.last_message == ""):
-        result = swe.run(json.dumps(data))
-        result = result['messages'][-1].content
+        if (swe.last_message == ""):
+            result = swe.run(json.dumps(data))
+            result = result['messages'][-1].content
 
-        verifiedCode = verifier.run(result)
+            verifiedCode = verifier.run(result)
+            swe.last_message = verifiedCode
+            result = verifiedCode
+        else:
+            result = swe.last_message
+
+        cwd = os.getcwd() 
+        filePath = os.path.join(cwd, '..', 'app', 'generatedmvp', 'page.tsx')
+
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(filePath), exist_ok = True)
+    
+        with open(filePath, 'w') as f:
+            f.write(result)
+
+        response = {
+            "message": "MVP generated, verified, and saved successfully.", 
+            "result": result
+        }
+        return jsonify(response), 200
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/generate_context_page', methods=['POST'])
+def generate_context_page():
+    try:
+        data = request.json
+        contextResult = swe.run(data)
+
+        verifiedCode = verifier.run(contextResult['pageContent'])
         swe.last_message = verifiedCode
-        result = verifiedCode
-    else:
-        result = swe.last_message
-    
-    cwd = os.getcwd() 
-    filePath = os.path.join(cwd, '..', 'app', 'generatedmvp', 'page.tsx')
+        contextResult = verifiedCode
 
-    # Ensure the directory exists
-    os.makedirs(os.path.dirname(filePath), exist_ok = True)
-    
-    with open(filePath, 'w') as f:
-        f.write(result)
+        cwd = os.getcwd() 
+        filePath = os.path.join(cwd, '..', 'app', 'generatedmvp', 'page.tsx')
 
-    response = {
-        "message": "MVP generated, verified, and saved successfully.", 
-        "result": result
-    }
-    return jsonify(response), 200
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(filePath), exist_ok = True)
+    
+        with open(filePath, 'w') as f:
+            f.write(contextResult)
+
+        response = {
+            "message": "Context page generated, verified, and saved successfully.", 
+            "result": contextResult
+        }
+        return jsonify(response), 200
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)}), 500
 
 def findFreePort():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
