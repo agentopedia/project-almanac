@@ -183,7 +183,14 @@ export default function DesignThinkingAgentOutput() {
       }}
     >
       {/* Loading Screen */}
-      {loading && <div className="loading-overlay">Loading Product Viability Agent...</div>}
+      {loading && (
+        <div className="loading-overlay" role="status" aria-busy="true">
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <span className="spinner" />
+            <p style={{ marginTop: '1rem' }}>Loading Product Viability Agent...</p>
+          </div>
+        </div>
+      )}
 
       <main style={{ width: "80%" }}>
         <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>Design Thinking Agent</h1>

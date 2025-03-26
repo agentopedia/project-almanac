@@ -1,5 +1,4 @@
 import React from 'react';
-import '../../public/globals.css';
 
 interface CustomerJourneyMapProps {
   journeyData: {

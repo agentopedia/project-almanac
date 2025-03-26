@@ -25,6 +25,7 @@ type ProductData = {
 };
 
 const ProductViability = () => {
+  const [loadingMessage, setLoadingMessage] = useState("Loading...");
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<string>("Introduction");
   const [parsedProductData, setParsedProductData] = useState<ProductData | null>(null); // parsed product data
@@ -134,6 +135,8 @@ const ProductViability = () => {
   }, [activeTab, sections]);
 
   const handleBackToDesign = async () => {
+    setLoadingMessage("Returning to Design Thinking Agent...");
+    setLoading(true);
     try {
       // Make a GET request to the Next.js API route
       const response = await fetch("/api/design_backtracking", {
@@ -154,7 +157,8 @@ const ProductViability = () => {
   };
 
   const handleProceedToSWEAgent = async () => {
-    setLoading(true); // Start loading indicator
+    setLoadingMessage("Loading Autonomous SWE Agent...");
+    setLoading(true);
 
     try {
       const response = await fetch("/api/swe_model", {
@@ -206,7 +210,12 @@ const ProductViability = () => {
   return (
     <div style={{ padding: "20px", minHeight: "100vh", backgroundColor: "#222", color: "white" }}>
       {loading ? (
-        <div className="loading-overlay">Loading Autonomous SWE Agent...</div>
+        <div className="loading-overlay" role="status" aria-busy="true">
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <span className="spinner" />
+            <p style={{ marginTop: '1rem' }}>{loadingMessage}</p>
+          </div>
+        </div>
       ) : (
         <>
           {/* Header */}

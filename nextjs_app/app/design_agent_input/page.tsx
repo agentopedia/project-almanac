@@ -40,7 +40,14 @@ export default function DesignThinkingAgentInput() {
 
   return (
     <div style={{ padding: "1rem", color: "white", backgroundColor: "#222222", minHeight: "100vh", textAlign: "center" }}>
-      {loading && <div className="loading-overlay">Loading Design Thinking Agent...</div>}
+      {loading && (
+        <div className="loading-overlay" role="status" aria-busy="true">
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <span className="spinner" />
+            <p style={{ marginTop: '1rem' }}>Loading Design Thinking Agent...</p>
+          </div>
+        </div>
+      )}
 
       <main style={{ marginTop: "2rem" }}>
         <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>Product Ideation</h1>
