@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import '../styles/agents.css';
 
 export default function SoftwareAgentPage() {
   const [loading, setLoading] = useState(false);

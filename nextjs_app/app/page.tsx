@@ -1,5 +1,6 @@
 "use client";
 import Link from 'next/link';
+import './styles/agents.css';
 
 export default function Home() {
   return (

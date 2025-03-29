@@ -3,12 +3,14 @@ import Link from 'next/link';
 import { useState } from 'react';
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import '../styles/agents.css';
 
 export default function DesignThinkingAgentInput() {
   const [inputText, setInputText] = useState('');
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

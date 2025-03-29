@@ -47,6 +47,21 @@ def run_agent():
     response = {"message": "Query received", "result": result}
     return jsonify(response), 200
 
+@app.route('/update_persona', methods=['POST'])
+def update_customer_info():
+    data = request.json
+    customer = data['customer']
+    if design.last_message == "": #THIS IS FOR TESTING PURPOSES if the design last message is empty - which it shouldnt be if you started from the beginning
+        design.last_message = "{'customer_persona': [{'name': 'Flora, the Budding Biologist', 'demographics': {'age': 16, 'gender': 'Female', 'occupation': 'High School Student'}, 'description': 'Flora is a bright and curious high school student with a passion for biology and wildlife. She is particularly fascinated by amphibians, especially frogs, and dreams of becoming a herpetologist. She is active on social media, loves nature photography, and is always looking for opportunities to learn more about the natural world. She is also involved in her school\\'s science club and environmental awareness programs.'}], 'empathy_map': {'says': ['\"I wish I knew more about different frog species.\"', '\"It\\'s hard to find reliable information about frog care.\"', '\"I want to share my love for frogs with others.\"', '\"Are there any frogs local to my area?\"'], 'thinks': ['\"Frogs are so interesting, but often misunderstood.\"', '\"I wonder what the best way to protect frog habitats is.\"', '\"I hope I can make a difference in frog conservation.\"', '\"I need a good source of information to learn about frogs.\"'], 'does': ['Reads articles and books about frogs.', 'Watches documentaries about amphibians.', 'Visits local ponds and wetlands to observe frogs.', 'Participates in citizen science projects related to frog monitoring.', 'Shares frog photos and facts on social media.'], 'feels': ['Excited about discovering new frog species.', 'Frustrated by the lack of accessible information about frogs.', 'Concerned about the threats to frog populations.', 'Inspired to take action to protect frogs and their habitats.']}, 'customer_journey_map': {'awareness': 'Sees an ad for the frog app on social media or a science blog.', 'comparison': 'Compares the app to other nature apps and online resources about frogs, looking at features, reviews, and price (if applicable).', 'purchase': 'Downloads the app because it offers a comprehensive database of frog species, interactive identification tools, and community features for sharing observations.', 'installation': \"Easily downloads and installs the app, creates a profile, and starts exploring frog species and local frog sightings. Finds the app intuitive and engaging.\"}, 'problem_statement': 'Young biology enthusiasts lack a centralized, engaging, and reliable mobile resource for learning about frog species, identification, conservation, and community engagement.'}"
+    info = json5.loads(design.last_message)
+    info["customer_persona"][0] = customer #changing the field
+    design.last_message = json.dumps(info) #reassigning the last message to the data with the updated customer persona
+    result = design.last_message
+    print("updated message: ")
+    print(design.last_message)
+    response = {"message": "Update received", "result": result}
+    return jsonify(response), 200
+
 @app.route('/viability', methods=['GET'])
 def get_viability_data():
     #just for testing purposes
@@ -83,8 +98,9 @@ def get_design_output(): #can be any name you want, wont use this name again
     print("in design backtracking")
     result = design.last_message
     response = ""
-    if result == "":
-        response = {"message": "Error, design agent has no last message data saved"}
+    if result == "": #TESTING PURPOSES ONLY
+        result = "{'customer_persona': [{'name': 'Flora, the Budding Biologist', 'demographics': {'age': 16, 'gender': 'Female', 'occupation': 'High School Student'}, 'description': 'Flora is a bright and curious high school student with a passion for biology and wildlife. She is particularly fascinated by amphibians, especially frogs, and dreams of becoming a herpetologist. She is active on social media, loves nature photography, and is always looking for opportunities to learn more about the natural world. She is also involved in her school\\'s science club and environmental awareness programs.'}], 'empathy_map': {'says': ['\"I wish I knew more about different frog species.\"', '\"It\\'s hard to find reliable information about frog care.\"', '\"I want to share my love for frogs with others.\"', '\"Are there any frogs local to my area?\"'], 'thinks': ['\"Frogs are so interesting, but often misunderstood.\"', '\"I wonder what the best way to protect frog habitats is.\"', '\"I hope I can make a difference in frog conservation.\"', '\"I need a good source of information to learn about frogs.\"'], 'does': ['Reads articles and books about frogs.', 'Watches documentaries about amphibians.', 'Visits local ponds and wetlands to observe frogs.', 'Participates in citizen science projects related to frog monitoring.', 'Shares frog photos and facts on social media.'], 'feels': ['Excited about discovering new frog species.', 'Frustrated by the lack of accessible information about frogs.', 'Concerned about the threats to frog populations.', 'Inspired to take action to protect frogs and their habitats.']}, 'customer_journey_map': {'awareness': 'Sees an ad for the frog app on social media or a science blog.', 'comparison': 'Compares the app to other nature apps and online resources about frogs, looking at features, reviews, and price (if applicable).', 'purchase': 'Downloads the app because it offers a comprehensive database of frog species, interactive identification tools, and community features for sharing observations.', 'installation': \"Easily downloads and installs the app, creates a profile, and starts exploring frog species and local frog sightings. Finds the app intuitive and engaging.\"}, 'problem_statement': 'Young biology enthusiasts lack a centralized, engaging, and reliable mobile resource for learning about frog species, identification, conservation, and community engagement.'}"
+        response = {"message": "Error, design agent has no last message data saved, loading dummy data", "result": result} 
     else:
         response = {"message": "Success", "result": result}
     print(response)

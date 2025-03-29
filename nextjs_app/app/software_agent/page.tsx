@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import '../globals.css';
+import '../styles/agents.css';
 import SideNav from "../components/SideNav";
 
 const Software_Agent: React.FC = () => {

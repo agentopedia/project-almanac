@@ -2,9 +2,11 @@
 import Link from 'next/link';
 import EmpathyMap from '../components/EmpathyMap';
 import CustomerJourney from '../components/CustomerJourney';
+import CustomerPersona from '../components/CustomerPersona';
 import { useRouter } from 'next/navigation';
 import JSON5 from 'json5';
 import { useEffect, useState } from "react";
+import '../styles/agents.css';
 
 interface CustomerPersona {
   name: string;
@@ -34,27 +36,27 @@ interface ParsedData {
 }
 
 const defaultPersona: CustomerPersona = {
-  name: "",
+  name: "Loading...",
   demographics: {
     age: 0,
-    gender: "",
-    occupation: ""
+    gender: "Loading...",
+    occupation: "Loading..."
   },
-  description: ""
+  description: "Loading..."
 };
 
 const defaultEmpathyData = {
-  says: [""],
-  thinks: [""],
-  does: [""],
-  feels: [""]
+  says: ["Loading..."],
+  thinks: ["Loading..."],
+  does: ["Loading..."],
+  feels: ["Loading..."]
 };
 
 const defaultJourneyMap = {
-  awareness: '',
-  comparison: '',
-  purchase: '',
-  installation: '',
+  awareness: 'Loading...',
+  comparison: 'Loading...',
+  purchase: 'Loading...',
+  installation: 'Loading...',
 };
 
 
@@ -92,59 +94,6 @@ export default function DesignThinkingAgentOutput() {
   }, []);  
 
   console.log('Parsed Data:', parsedData)
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setPersona((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleDemographicsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setPersona((prev) => ({
-      ...prev,
-      demographics: {
-        ...prev.demographics,
-        [name]: value
-      }
-    }));
-  };
-
-  const handleEdit = () => {
-    setOriginalPersona({ ...persona }); // store current state before editing
-    setIsEditing(true);
-  };  
-
-  const handleCancel = () => {
-    if (originalPersona) {
-      setPersona(originalPersona); // restore original data
-    }
-    setIsEditing(false);
-  };  
-
-  const handleSave = async () => {
-    try {
-      const response = await fetch("/api/update_persona", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(persona),
-      });
-  
-      if (!response.ok) {
-        throw new Error("Failed to save persona");
-      }
-  
-      console.log("Persona updated successfully");
-    } catch (error) {
-      console.error("Error updating persona:", error);
-    }
-  
-    setIsEditing(false);
-  };    
 
   const handleProceed = async () => {
     setLoading(true); // show loading screen
@@ -196,92 +145,7 @@ export default function DesignThinkingAgentOutput() {
         <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>Design Thinking Agent</h1>
 
         {/* Customer Persona Section */}
-        <div style={{ marginBottom: "2rem", padding: "1rem", borderRadius: "8px", backgroundColor: "var(--primary-color)", color: "white", textAlign: "left" }}>
-          <h2 style={{ fontSize: "1.75rem", textAlign: "center" }}>Customer Persona</h2>
-
-          {isEditing ? (
-            <div>
-              <label style={{ fontWeight: "bold" }}>Name:</label>
-              <input
-                type="text"
-                name="name"
-                value={persona.name}
-                onChange={handleChange}
-                style={{ width: "100%", padding: "0.5rem", margin: "0.5rem 0", borderRadius: "5px" }}
-              />
-
-              <label style={{ fontWeight: "bold" }}>Age:</label>
-              <input
-                type="number"
-                name="age"
-                value={persona.demographics.age}
-                onChange={handleDemographicsChange}
-                style={{ width: "100%", padding: "0.5rem", margin: "0.5rem 0", borderRadius: "5px" }}
-              />
-
-              <label style={{ fontWeight: "bold" }}>Gender:</label>
-              <input
-                type="text"
-                name="gender"
-                value={persona.demographics.gender}
-                onChange={handleDemographicsChange}
-                style={{ width: "100%", padding: "0.5rem", margin: "0.5rem 0", borderRadius: "5px" }}
-              />
-
-              <label style={{ fontWeight: "bold" }}>Occupation:</label>
-              <input
-                type="text"
-                name="occupation"
-                value={persona.demographics.occupation}
-                onChange={handleDemographicsChange}
-                style={{ width: "100%", padding: "0.5rem", margin: "0.5rem 0", borderRadius: "5px" }}
-              />
-
-              <label style={{ fontWeight: "bold" }}>Description:</label>
-              <textarea
-                name="description"
-                value={persona.description}
-                onChange={handleChange}
-                style={{ width: "100%", padding: "0.5rem", margin: "0.5rem 0", borderRadius: "5px", minHeight: "100px" }}
-              />
-            </div>
-          ) : (
-            <div>
-              <p><strong>Name:</strong> {persona.name}</p>
-              <p><strong>Age:</strong> {persona.demographics.age}</p>
-              <p><strong>Gender:</strong> {persona.demographics.gender}</p>
-              <p><strong>Occupation:</strong> {persona.demographics.occupation}</p>
-              <p><strong>Description:</strong> {persona.description}</p>
-            </div>
-          )}
-
-          {/* Buttons */}
-          <div style={{ textAlign: "right", marginTop: "1rem" }}>
-          {isEditing ? (
-            <>
-              <button 
-                onClick={handleSave} 
-                style={{ padding: "0.5rem 1rem", backgroundColor: "var(--secondary-color)", color: "white", border: "none", borderRadius: "5px", cursor: "pointer", marginRight: "0.5rem" }}
-              >
-                Save
-              </button>
-              <button 
-                onClick={handleCancel} 
-                style={{ padding: "0.5rem 1rem", backgroundColor: "var(--text-color-secondary)", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
-            <button 
-              onClick={handleEdit} 
-              style={{ padding: "0.5rem 1rem", backgroundColor: "var(--secondary-color)", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}
-            >
-              Edit
-            </button>
-          )}
-        </div>
-        </div>
+        <CustomerPersona persona={persona} onUpdatePersona={setPersona} />
 
         <div
           style={{

@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import InstallBootstrap from "./components/InstallBootstrap";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import "./globals.css"
+import './styles/agents.css';
 
 export default function RootLayout({
   children,

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import './styles/agents.css';
 
 export default function Navbar() {
   return (
