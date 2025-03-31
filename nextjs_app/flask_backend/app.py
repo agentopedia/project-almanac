@@ -5,6 +5,7 @@ from business_model_agent import BusinessModelAgent
 from viability_agent import ProductViabilityAgent
 from swe_agent import SWESystemAgent
 from swe_verifier_agent import SWEVerifierAgent
+from customer_feedback_agent import CustomerFeedbackAgent
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.tools.tavily_search import TavilySearchResults
@@ -31,6 +32,7 @@ viability = ProductViabilityAgent(model, tools)
 business = BusinessModelAgent(model, tools)
 swe = SWESystemAgent(model, tools)
 verifier = SWEVerifierAgent(model, tools)
+feedback = CustomerFeedbackAgent(model, tools)
 
 @app.route('/design_input', methods=['POST'])
 def run_agent():
@@ -38,6 +40,7 @@ def run_agent():
     design.last_message = ""
     viability.last_message = ""
     swe.last_message = "" # UNCOMMENTED
+    feedback.last_message = ""
     data = request.json
     query = data['query']
     print("query: " + query)
@@ -54,18 +57,16 @@ def update_customer_info():
     if design.last_message == "": #THIS IS FOR TESTING PURPOSES if the design last message is empty - which it shouldnt be if you started from the beginning
         design.last_message = "{'customer_persona': [{'name': 'Flora, the Budding Biologist', 'demographics': {'age': 16, 'gender': 'Female', 'occupation': 'High School Student'}, 'description': 'Flora is a bright and curious high school student with a passion for biology and wildlife. She is particularly fascinated by amphibians, especially frogs, and dreams of becoming a herpetologist. She is active on social media, loves nature photography, and is always looking for opportunities to learn more about the natural world. She is also involved in her school\\'s science club and environmental awareness programs.'}], 'empathy_map': {'says': ['\"I wish I knew more about different frog species.\"', '\"It\\'s hard to find reliable information about frog care.\"', '\"I want to share my love for frogs with others.\"', '\"Are there any frogs local to my area?\"'], 'thinks': ['\"Frogs are so interesting, but often misunderstood.\"', '\"I wonder what the best way to protect frog habitats is.\"', '\"I hope I can make a difference in frog conservation.\"', '\"I need a good source of information to learn about frogs.\"'], 'does': ['Reads articles and books about frogs.', 'Watches documentaries about amphibians.', 'Visits local ponds and wetlands to observe frogs.', 'Participates in citizen science projects related to frog monitoring.', 'Shares frog photos and facts on social media.'], 'feels': ['Excited about discovering new frog species.', 'Frustrated by the lack of accessible information about frogs.', 'Concerned about the threats to frog populations.', 'Inspired to take action to protect frogs and their habitats.']}, 'customer_journey_map': {'awareness': 'Sees an ad for the frog app on social media or a science blog.', 'comparison': 'Compares the app to other nature apps and online resources about frogs, looking at features, reviews, and price (if applicable).', 'purchase': 'Downloads the app because it offers a comprehensive database of frog species, interactive identification tools, and community features for sharing observations.', 'installation': \"Easily downloads and installs the app, creates a profile, and starts exploring frog species and local frog sightings. Finds the app intuitive and engaging.\"}, 'problem_statement': 'Young biology enthusiasts lack a centralized, engaging, and reliable mobile resource for learning about frog species, identification, conservation, and community engagement.'}"
     info = json5.loads(design.last_message)
-    info["customer_persona"][0] = customer #changing the field
+    info["customer_persona"][0] = customer #changing the customer persona field
     design.last_message = json.dumps(info) #reassigning the last message to the data with the updated customer persona
     result = design.last_message
-    print("updated message: ")
-    print(design.last_message)
+    # print("updated message: ")
+    # print(design.last_message)
     response = {"message": "Update received", "result": result}
     return jsonify(response), 200
 
 @app.route('/viability', methods=['GET'])
 def get_viability_data():
-    #just for testing purposes
-    # design.last_message = """{"customer_persona":[{"name":"Professor Annelise","demographics":{"age":45,"gender":"Female","occupation":"Biology Professor"},"description":"Annelise is a dedicated biology professor with a passion for herpetology, seeking engaging and reliable resources for her classes and research, valuing accuracy, up-to-date information, and user-friendly interfaces."}],"empathy_map":{"says":["I need a reliable source of information on frog species.","My students need engaging learning materials.","It's difficult to find all the information I need in one place."],"thinks":["This web app could save me a lot of time.","I hope the information is accurate and up-to-date.","Will this app be engaging enough for my students?"],"does":["Searches online for frog information.","Looks through textbooks and journals.","Prepares lectures and assignments using various resources."],"feels":["Frustrated by the lack of a comprehensive resource.","Overwhelmed by the amount of information to sift through.","Excited about the potential of a user-friendly web app."]},"customer_journey_map":{"awareness":"Annelise hears about the web app from a colleague at a conference.","comparison":"She compares the web app to other online resources, checking for accuracy, comprehensiveness, and user-friendliness.","purchase":"She decides to use the web app for its comprehensive information and engaging features, free of charge.","installation":"She easily accesses the web app through her browser and finds the interface intuitive and easy to navigate."},"problem_statement":"Biology professors and students lack a comprehensive, accurate, and engaging online resource for learning about frog species, leading to frustration, time wasted on searching multiple sources, and a suboptimal learning experience."}"""
     data = json5.loads(design.last_message) #getting the last message from the design thinking agent
     print("problem statement: " + data["problem_statement"])
     if (viability.last_message == ""):
@@ -74,18 +75,16 @@ def get_viability_data():
     else:
         print("API not called, previous PRD loaded")
         viability_result = viability.last_message
-    #just for testing purposes
-    # viability_result = """{"introduction":["This product is a web application designed to provide biology professors and students with a comprehensive, accurate, and engaging online resource for learning about frog species. It addresses the current lack of a centralized, reliable source of information, saving users time and enhancing the learning experience."],"goals":["To create a one-stop online resource for all things related to frog species.","To provide accurate, up-to-date, and reliable information for both educational and research purposes.","To offer an engaging and user-friendly interface that caters to both professors and students.","To improve the efficiency of information gathering for biology educators and students.","To enhance the learning and research experience related to herpetology."],"target_audience":["Biology professors teaching courses related to herpetology or ecology.","University students studying biology, zoology, or related fields.","Researchers conducting studies on frog species.","Anyone with a general interest in learning about frog species."],"product_features":["A comprehensive database of frog species information, including taxonomy, morphology, habitat, behavior, and conservation status.","High-quality images and videos of various frog species.","Interactive maps showing the geographic distribution of different frog species.","Engaging learning modules and quizzes to enhance knowledge retention.","A search function to easily find specific information.","Downloadable resources such as fact sheets and presentations.","A user-friendly interface accessible on various devices."],"functional_requirements":["The application should allow users to search for information on specific frog species using keywords or scientific names.","The application should display detailed information about each frog species, including images, videos, and geographic distribution maps.","The application should provide interactive learning modules and quizzes.","The application should allow users to download resources such as fact sheets and presentations.","The application should be responsive and accessible across different devices and browsers.","The application should be integrated with a reliable and up-to-date source of information on frog species."],"nonfunctional_requirements":["The application should be user-friendly and intuitive.","The information presented should be accurate, reliable, and up-to-date.","The application should be accessible to users with disabilities.","The application should be secure and protect user data.","The application should be scalable to handle a large number of users and data.","The application should be performant and load quickly."]}"""
-    print(viability_result)
+    # print(viability_result)
 
-    ##business agent call
+    #business agent call
     if business.last_message == "":
         business_result = business.run(data["problem_statement"])  # Generate Business Model Canvas
         business_result = business.cleanJsonContent(business_result['messages'][-1].content)  # Clean and return
     else:
         print("API not called, previous Business Model loaded")
         business_result = business.last_message
-
+    print(business_result)
     response = {
         "message": "Success",
         "viability_result": viability_result,
@@ -95,7 +94,7 @@ def get_viability_data():
 
 @app.route('/design_backtracking', methods=['GET'])
 def get_design_output(): #can be any name you want, wont use this name again
-    print("in design backtracking")
+    # print("in design backtracking")
     result = design.last_message
     response = ""
     if result == "": #TESTING PURPOSES ONLY
@@ -103,9 +102,10 @@ def get_design_output(): #can be any name you want, wont use this name again
         response = {"message": "Error, design agent has no last message data saved, loading dummy data", "result": result} 
     else:
         response = {"message": "Success", "result": result}
-    print(response)
+    # print(response)
     return jsonify(response), 200
 
+# we didnt ever use this i dont think 
 @app.route('/ideation_backtracking', methods=['GET'])
 def get_product_idea(): 
     print("in product ideation backtracking")
@@ -188,6 +188,31 @@ def generate_context_page():
     except Exception as e:
         traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/customer_feedback', methods=['GET'])
+def get_feedback():
+    result = ""
+    if design.last_message == "" or swe.last_message == "": #TESTING PURPOSES ONLY
+        result = """{"overview": "The Cosmic Companion app is a promising start for budding biologists like Flora. It offers features like real-time sky data based on location, information on astronomical events, and personalization options. However, the app's usability, content, and appearance need improvements to make it more engaging and informative for a young user.", "usability": "The app's location detection is a great feature, but the loading times for fetching sky data should be optimized. The navigation to other sections (object database, astronomical events, SWE Agent) isn't clear and needs better visual cues. The form for personalizing the experience is functional, but it lacks immediate feedback upon saving preferences.", "content": "While the app mentions providing real-time data and a comprehensive database, there's no actual sky data displayed in the provided code (only a placeholder for JSON). The description of the astronomical events calendar is vague. The link to NASA is helpful, but the app could benefit from integrating more educational content directly.", "appearance": "The dark background with light text is readable but lacks visual appeal for a younger audience. The night sky image is generic, and the overall design feels a bit outdated. The font size is adequate, but the layout could be more dynamic and engaging.", "improvements": ["Implement actual sky data visualization (e.g., using a sky map or constellation diagrams).", "Add interactive elements to the sky data display, allowing users to click on celestial objects for more information.", "Improve the visual design with a more modern and engaging color scheme, fonts, and graphics (consider incorporating space-themed illustrations or animations).", "Provide clear navigation cues and visual feedback for button clicks and form submissions.", "Incorporate educational content directly into the app, such as short descriptions of constellations, planets, and other celestial objects.", "Optimize loading times for fetching sky data.", "Add a confirmation message or visual cue after saving personalization preferences.", "Make the 'Explore Now' button navigate to an actual object database with relevant information.", "Implement the astronomical events calendar with specific dates and details."]}"""
+    else:
+        design_data = json5.loads(design.last_message) #getting the last message from the design thinking agent
+        persona = design_data["customer_persona"]
+        feedback.run(str({"customer_persona": persona, "app": swe.last_message}))
+        result = feedback.last_message
+        print(feedback.last_message)
+   
+    response = {"message": "Success", "result": str(result)}
+    return jsonify(response), 200
+
+@app.route('/update_feedback', methods=['POST'])
+def update_customer_feedback():
+    data = request.json
+    info = data['feedback']
+    feedback.last_message = json.dumps(info) #reassigning the last message to the updated customer feedback
+    result = feedback.last_message
+    response = {"message": "Update received", "result": result}
+    return jsonify(response), 200
+
 
 def findFreePort():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

@@ -1,27 +1,79 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-const SkateSpotApp = () => {
+const CosmicCompanion = () => {
     const router = useRouter();
+    const [location, setLocation] = useState<{ latitude: number | null; longitude: number | null }>({
+        latitude: null,
+        longitude: null,
+      });
+    const [skyData, setSkyData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [formData, setFormData] = useState({
         username: '',
         email: '',
-        age: '',
-        skillLevel: 'beginner',
-        favoriteSpot: '',
-        buttonName: '',
+        favoriteObject: '',
     });
+
+    useEffect(() => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setLocation({
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                    });
+                },
+                (error) => {
+                    console.error("Error getting location:", error);
+                    setError("Failed to get location. Please enable location services.");
+                }
+            );
+        } else {
+            setError("Geolocation is not supported by this browser.");
+        }
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleButtonClick = async (buttonName) => {
+    const fetchSkyData = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const res = await fetch('/api/swe_model', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'navigate',
+                    buttonName: 'Fetch Sky Data',
+                    formData: {
+                        latitude: location.latitude,
+                        longitude: location.longitude
+                    }
+                }),
+            });
+
+            if (!res.ok) {
+                throw new Error('Failed to fetch sky data');
+            }
+
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleButtonClick = async (buttonName: string) => {
         setLoading(true);
         setError(null);
 
@@ -39,37 +91,8 @@ const SkateSpotApp = () => {
             });
 
             if (!res.ok) {
-                throw new Error('Failed to perform action');
+                throw new Error('Navigation failed');
             }
-
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError(null);
-
-        try {
-            const res = await fetch('/api/swe_model', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'navigate',
-                    ...formData,
-                }),
-            });
-
-            if (!res.ok) {
-                throw new Error('Failed to submit form');
-            }
-
 
         } catch (err) {
             setError(err.message);
@@ -79,149 +102,79 @@ const SkateSpotApp = () => {
     };
 
     return (
-        <div className="container-fluid">
-            <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-                <a className="navbar-brand" href="#">
-                    SkateSpot
-                </a>
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav ml-auto">
-                        <li className="nav-item">
-                            <button className="nav-link btn btn-link text-white" onClick={() => handleButtonClick('find_spots')}>Find Spots</button>
-                        </li>
-                        <li className="nav-item">
-                            <button className="nav-link btn btn-link text-white" onClick={() => handleButtonClick('trick_tutorials')}>Trick Tutorials</button>
-                        </li>
-                        <li className="nav-item">
-                            <button className="nav-link btn btn-link text-white" onClick={() => handleButtonClick('community_feed')}>Community Feed</button>
-                        </li>
-                        <li className="nav-item">
-                            <button className="nav-link btn btn-link text-white" onClick={() => handleButtonClick('progress_tracker')}>Progress Tracker</button>
-                        </li>
-                    </ul>
+        <div className="container-fluid bg-dark text-light p-5">
+            <div className="row">
+                <div className="col-md-8">
+                    <h1 className="display-4">Explore the Cosmos with Cosmic Companion</h1>
+                    <p className="lead">Your personal guide to the night sky. Discover stars, planets, and constellations in real-time.</p>
+                    <hr className="my-4" style={{ borderColor: '#fff' }} />
+                    {error && <div className="alert alert-danger">{error}</div>}
+                    {location.latitude && location.longitude ? (
+                        <>
+                            <p>Your location: Latitude {location.latitude.toFixed(2)}, Longitude {location.longitude.toFixed(2)}</p>
+                            <button className="btn btn-outline-info btn-lg" onClick={fetchSkyData} disabled={loading}>
+                                {loading ? 'Loading sky data...' : 'View Sky Data'}
+                            </button>
+                        </>
+                    ) : (
+                        <p>Waiting for location...</p>
+                    )}
+
+                    {skyData && (
+                        <div className="mt-4">
+                            <h2>Sky Data</h2>
+                            <pre>{JSON.stringify(skyData, null, 2)}</pre>
+                        </div>
+                    )}
                 </div>
-            </nav>
 
-            <div className="jumbotron bg-light text-center py-5">
-                <h1 className="display-4">Welcome to SkateSpot</h1>
-                <p className="lead">Discover, share, and track your skateboarding journey.</p>
-                <button className="btn btn-primary btn-lg" onClick={() => handleButtonClick('get_started')}>Get Started</button>
-            </div>
-
-            <div className="container mt-4">
-                <div className="row">
-                    <div className="col-md-4">
-                        <div className="card shadow-sm">
-                            <div className="card-body">
-                                <h5 className="card-title">Explore Skate Spots</h5>
-                                <p className="card-text">Find the best skate spots in your city and around the world.</p>
-                                <button className="btn btn-success" onClick={() => handleButtonClick('explore_spots')}>Explore Now</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-md-4">
-                        <div className="card shadow-sm">
-                            <div className="card-body">
-                                <h5 className="card-title">Learn New Tricks</h5>
-                                <p className="card-text">Access a library of trick tutorials to improve your skills.</p>
-                                <button className="btn btn-info text-white" onClick={() => handleButtonClick('learn_tricks')}>Learn More</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-md-4">
-                        <div className="card shadow-sm">
-                            <div className="card-body">
-                                <h5 className="card-title">Connect with Community</h5>
-                                <p className="card-text">Share your progress and connect with fellow skaters.</p>
-                                <button className="btn btn-warning" onClick={() => handleButtonClick('join_community')}>Join Now</button>
-                            </div>
+                <div className="col-md-4">
+                    <div className="card bg-secondary text-white">
+                        <img
+                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Night_sky.jpg/800px-Night_sky.jpg"
+                            className="card-img-top"
+                            alt="Night Sky"
+                            style={{ maxHeight: '200px', objectFit: 'cover' }}
+                        />
+                        <div className="card-body">
+                            <h5 className="card-title">Discover a Universe of Information</h5>
+                            <p className="card-text">Dive deep into our comprehensive database of celestial objects.</p>
+                            <button onClick={() => handleButtonClick('object_database')} className="btn btn-primary">Explore Now</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="container mt-5">
-                <h2>Sign Up</h2>
-                {error && <div className="alert alert-danger">{error}</div>}
+            <div className="row mt-5">
+                <div className="col-md-6">
+                    <h2 className="mb-4">Stay Updated on Astronomical Events</h2>
+                    <p>Never miss a meteor shower or lunar eclipse. Our calendar keeps you informed.</p>
+                    <button onClick={() => handleButtonClick('astronomical_events')} className="btn btn-success btn-lg">View Calendar</button>
+                </div>
 
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                        <label htmlFor="username" className="form-label">Username</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="username"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="mb-3">
-                        <label htmlFor="email" className="form-label">Email</label>
-                        <input
-                            type="email"
-                            className="form-control"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="mb-3">
-                        <label htmlFor="age" className="form-label">Age</label>
-                        <input
-                            type="number"
-                            className="form-control"
-                            id="age"
-                            name="age"
-                            value={formData.age}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div className="mb-3">
-                        <label htmlFor="skillLevel" className="form-label">Skill Level</label>
-                        <select
-                            className="form-control"
-                            id="skillLevel"
-                            name="skillLevel"
-                            value={formData.skillLevel}
-                            onChange={handleChange}
-                        >
-                            <option value="beginner">Beginner</option>
-                            <option value="intermediate">Intermediate</option>
-                            <option value="advanced">Advanced</option>
-                        </select>
-                    </div>
-
-                    <div className="mb-3">
-                        <label htmlFor="favoriteSpot" className="form-label">Favorite Spot</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="favoriteSpot"
-                            name="favoriteSpot"
-                            value={formData.favoriteSpot}
-                            onChange={handleChange}
-                        />
-                    </div>
-                    <button type="submit" className="btn btn-success" disabled={loading}>
-                        {loading ? 'Signing Up...' : 'Sign Up'}
-                    </button>
-                </form>
+                <div className="col-md-6">
+                    <h2 className="mb-4">Personalize Your Experience</h2>
+                    <form>
+                        <div className="mb-3">
+                            <label htmlFor="username" className="form-label">Username</label>
+                            <input type="text" className="form-control" id="username" name="username" value={formData.username} onChange={handleChange} />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="email" className="form-label">Email address</label>
+                            <input type="email" className="form-control" id="email" name="email" value={formData.email} onChange={handleChange} />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="favoriteObject" className="form-label">Favorite Celestial Object</label>
+                            <input type="text" className="form-control" id="favoriteObject" name="favoriteObject" value={formData.favoriteObject} onChange={handleChange} />
+                        </div>
+                        <button type="button" className="btn btn-warning" onClick={() => handleButtonClick('personalize')}>Save Preferences</button>
+                    </form>
+                </div>
             </div>
 
-            <footer className="footer mt-auto py-3 bg-dark text-white text-center">
-                <div className="container">
-                    <span className="text-muted">SkateSpot - Connecting Skaters Worldwide &copy; {new Date().getFullYear()}</span>
-                </div>
+            <footer className="mt-5 text-center">
+                <p>&copy; 2024 Cosmic Companion. All rights reserved.</p>
+                <a href="https://www.nasa.gov/" className="text-info" target="_blank" rel="noopener noreferrer">Learn more about NASA</a>
             </footer>
             <div className="flex justify-center mt-8 mb-8">
                 <button
@@ -235,4 +188,4 @@ const SkateSpotApp = () => {
     );
 };
 
-export default SkateSpotApp;
+export default CosmicCompanion;

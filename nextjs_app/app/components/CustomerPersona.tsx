@@ -76,7 +76,7 @@ export default function CustomerPersona({ persona, onUpdatePersona }: CustomerPe
       <h2  style={{ fontSize: "1.75rem", textAlign: "left" }}>Customer Persona</h2>
 
       {isEditing ? (
-        <div className="editingContainer">
+      <div className="editingContainer">
         {/* Horizontal row for Name, Age, Gender, and Occupation */}
         <div className="inputRow">
           <div className="inputGroup">
@@ -121,11 +121,11 @@ export default function CustomerPersona({ persona, onUpdatePersona }: CustomerPe
       </div> 
       ) : (
         <div>
-          <p><strong>Name:</strong> {persona.name}</p>
-          <p><strong>Age:</strong> {persona.demographics.age}</p>
-          <p><strong>Gender:</strong> {persona.demographics.gender}</p>
-          <p><strong>Occupation:</strong> {persona.demographics.occupation}</p>
-          <p><strong>Description:</strong> {persona.description}</p>
+          <p style={{color: "white"}}><strong>Name:</strong> {persona.name}</p>
+          <p style={{color: "white"}}><strong>Age:</strong> {persona.demographics.age}</p>
+          <p style={{color: "white"}}><strong>Gender:</strong> {persona.demographics.gender}</p>
+          <p style={{color: "white"}}><strong>Occupation:</strong> {persona.demographics.occupation}</p>
+          <p style={{color: "white"}}><strong>Description:</strong> {persona.description}</p>
           
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <button onClick={() =>{setIsEditing(true); setEditedPersona(persona)}} className="button button-secondary">Edit</button>

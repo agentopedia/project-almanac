@@ -216,7 +216,7 @@ button:hover, .button:hover {
 
 .swe-card .cardText {
   font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgb(255, 255, 255);
 }
 
 /* SWE agent feature page */
@@ -395,12 +395,14 @@ button:hover, .button:hover {
 
 .descriptionField {
   height: 120px;
-  resize: vertical;
+  /* resize: vertical; */
   width: 100%;
   padding: 0.5rem;
   margin: 0.1rem 0;
   border-radius: 5px;
   min-height: 120px;
+  display: flex;
+  flex-direction: column;
 }
 
 .buttonGroup {

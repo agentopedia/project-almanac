@@ -22,6 +22,8 @@ class SWEVerifierAgent(Agent):
         5. Make sure all API calls use the correct endpoint format.
         6. Ensure all event handlers are properly defined and used.
         7. Verify that state management is implemented correctly.
+        8. Ensure there are no non-ASCII characters in the application.
+        9. Define all the parameters. No parameter should implicitly be of type "any".
 
         Additionally, make sure there's a back button to the SWE model at the end of the component, implemented like this:
 

@@ -11,6 +11,7 @@ from pydrive2.drive import GoogleDrive
 
 class BusinessModelAgent(Agent):
     jsonFormat = {
+        "target_market": [],
         "customer_segments": [],
         "value_propositions": [],
         "channels": [],
@@ -24,6 +25,7 @@ class BusinessModelAgent(Agent):
 
     prompt = f"""You are a strategic business analyst tasked with creating a comprehensive business model canvas for a product. 
     Based on a provided problem statement, describe the following components of a business model canvas:
+    0. Target Market: What is the target market?
     1. Customer Segments: Who are the customers?
     2. Value Propositions: What value does the product provide?
     3. Channels: How does the product reach customers?

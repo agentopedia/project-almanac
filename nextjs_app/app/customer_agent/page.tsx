@@ -14,21 +14,12 @@ interface CustomerPersona {
   description: string;
 }
 
-interface ParsedData {
-  customer_persona: CustomerPersona[];
-  empathy_map: {
-    says: string[];
-    thinks: string[];
-    does: string[];
-    feels: string[];
-  };
-  customer_journey_map: {
-    awareness: string;
-    comparison: string;
-    purchase: string;
-    installation: string;
-  };
-  problem_statement: string;
+interface CustomerFeedback {
+  overview: string;
+  usability: string;
+  content: string;
+  appearance: string;
+  improvements: string[];
 }
 
 const defaultPersona: CustomerPersona = {
@@ -41,12 +32,23 @@ const defaultPersona: CustomerPersona = {
   description: "Loading...",
 };
 
+const defaultFeedback: CustomerFeedback = {
+  overview: "Loading...",
+  usability: "Loading...",
+  content: "Loading...",
+  appearance: "Loading...",
+  improvements: ["Loading..."]
+};
+
 export default function CustomerFeedbackAgent() {
   const [activeTab, setActiveTab] = useState("Customer");
   const [persona, setPersona] = useState<CustomerPersona>(defaultPersona);
-  const [originalPersona, setOriginalPersona] = useState<CustomerPersona | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-
+  const [feedback, setFeedback] = useState<CustomerFeedback>(defaultFeedback);
+  const [editedFeedback, setEditedFeedback] = useState<CustomerFeedback>(defaultFeedback);
+  const [isFetching, setIsFetching] = useState<boolean>(true);
+  const [isEditingFeedback, setIsEditingFeedback] = useState<boolean>(false);
+  const [feedbackFirstPress, setFeedbackFirstPress] = useState<boolean>(false);
+  
   useEffect(() => {
     async function fetchPersona() {
       try {
@@ -68,21 +70,137 @@ export default function CustomerFeedbackAgent() {
     fetchPersona();
   }, []);
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEditedFeedback((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleImprovementsChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const updatedImprovements = e.target.value.split("\n"); // Split input by newlines
+    setEditedFeedback({
+      ...editedFeedback,
+      improvements: updatedImprovements, // Update the improvements array
+    });
+  };
+
+  //call this function when the feedback tab is pressed - we make an api call
+  const getFeedback = async () => {
+    setFeedbackFirstPress(true);
+    setIsFetching(true);
+    console.log("getting feedback");
+    //set up API route for customer feedback
+    try {
+      const response = await fetch("/api/customer_feedback");
+      if (!response.ok) {
+        throw new Error("Failed to fetch feedback data");
+      }
+      const data = await response.json();
+      const parsed = JSON5.parse(data.result);
+      console.log(parsed)
+      setFeedback(parsed)
+    } catch (error) {
+      console.error("Error fetching feedback data:", error);
+    }
+    setIsFetching(false); 
+  };
+
+  const testingDisabledButton = () => {
+    console.log("button clicked");
+  }
+
   const renderContent = () => {
     switch (activeTab) {
       case "Customer":
         return (
+
         <main style={{ width: "60%" }}>
           <CustomerPersona persona={persona} onUpdatePersona={setPersona} />
         </main>
       );
       case "Feedback":
         return (
-          <div className="card">
-            <h2 className="cardTitle">Customer Feedback</h2>
-            <p className="cardText">[Display response from LLM, field is editable]</p>
-            <button className="button mt-4">Generate MVP</button>
-          </div>
+          <main style={{ width: "60%" }}>
+            <div style={{ marginBottom: "2rem", padding: "1rem", borderRadius: "8px", backgroundColor: "var(--primary-color)", color: "white", textAlign: "left", display: "flex", flexDirection: "column"}}>
+            <h2  style={{ fontSize: "1.75rem", textAlign: "left" }}>Customer Feedback</h2>
+            {isEditingFeedback ? (
+              <div className="editingContainer">
+                {/* Input fields for editing feedback */}
+                <div className="descriptionGroup">
+                  <label style={{ fontWeight: "bold" }}>Overview:</label>
+                  <textarea name="overview" value={editedFeedback.overview} onChange={handleChange} className="descriptionField" />
+                </div>
+
+                <div className="descriptionGroup">
+                  <label style={{ fontWeight: "bold" }}>Functionality:</label>
+                  <textarea name="usability" value={editedFeedback.usability} onChange={handleChange} className="descriptionField" />
+                </div>
+
+                <div className="descriptionGroup">
+                  <label style={{ fontWeight: "bold" }}>Content:</label>
+                  <textarea name="content" value={editedFeedback.content} onChange={handleChange} className="descriptionField" />
+                </div>
+
+                <div className="descriptionGroup">
+                  <label style={{ fontWeight: "bold" }}>Appearance:</label>
+                  <textarea name="appearance" value={editedFeedback.appearance} onChange={handleChange} className="descriptionField" />
+                </div>
+
+                <div className="descriptionGroup">
+                  <label style={{ fontWeight: "bold" }}>Improvements:</label>
+                  <textarea name="improvements" value={editedFeedback.improvements.join("\n")} onChange={handleImprovementsChange} className="descriptionField" />
+                </div>
+
+                
+                {/* Buttons */}
+                <div className="buttonGroup">
+                  <button className="button button-secondary"
+                    onClick={() => {
+                      setIsEditingFeedback(false);
+                      setFeedback(editedFeedback);
+                      // add functionality to save data to backend
+                    }}
+                    disabled={isFetching}>
+                    Save
+                  </button>
+                  <button onClick={() => { setEditedFeedback(feedback); setIsEditingFeedback(false);}} style={{ padding: "0.5rem 1rem", backgroundColor: "var(--text-color-secondary)", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>Cancel</button>
+                </div>
+              </div>
+            ) : (
+              // Display the feedback information when not editing
+              <div>
+                {/* Information */}
+                <p style={{color: "white", marginBottom: "0px"}}><strong>Overview:</strong></p>
+                  <p style={{color: "white", backgroundColor: "#00aaff", borderRadius: "10px", padding: "10px"}}> {feedback?.overview}</p>
+                <p style={{color: "white", marginBottom: "0px"}}><strong>Functionality:</strong></p>
+                  <p style={{color: "white", backgroundColor: "#00aaff", borderRadius: "10px", padding: "10px"}}> {feedback?.usability}</p>
+                <p style={{color: "white", marginBottom: "0px"}}><strong>Content:</strong></p>
+                  <p style={{color: "white", backgroundColor: "#00aaff", borderRadius: "10px", padding: "10px"}}> {feedback?.content}</p>  
+                <p style={{color: "white", marginBottom: "0px"}}><strong>Appearance:</strong></p>
+                  <p style={{color: "white", backgroundColor: "#00aaff", borderRadius: "10px", padding: "10px"}}> {feedback?.appearance}</p>
+                
+                <p style={{color: "white", marginBottom: "0px"}}><strong>Improvements:</strong></p>
+                  <div style={{backgroundColor: "#00aaff", borderRadius: "10px", padding: "10px"}}>
+                    {feedback?.improvements.map((item, index) => (
+                      <p key={index} style={{color: "white", marginBottom: "0px"}}>
+                        {index+1}. {item}
+                      </p>
+                    ))}
+                  </div>
+                
+
+                {/* Buttons */}
+                <div className="buttonGroup" >
+                  <button className="button button-secondary" onClick={getFeedback} disabled={isFetching}>Regenerate Feedback</button>
+                  <button className="button button-secondary" onClick={() =>{setIsEditingFeedback(true); setEditedFeedback(feedback)}} disabled={isFetching}>Edit</button>
+                </div>
+              </div>
+            )}
+            </div>
+
+          </main>
         );
 
       case "MVPs":
@@ -100,12 +218,24 @@ export default function CustomerFeedbackAgent() {
 
   return (
     <div className="container">
+      {/* Header */}
+      <header style={{ textAlign: "center", color: "white" }}>
+          <h1 style={{ fontSize: "2.5rem" }}>Customer Feedback Agent</h1>
+          <p style={{ fontSize: "1.3rem" }}>Iterate through MVPs</p>
+      </header>
+
+      {/* Selection Tabs */}
       <div className="flex-container mb-4">
         {["Customer", "Feedback", "MVPs"].map((tab) => (
           <button
             key={tab}
             className={`button ${activeTab === tab ? "button-secondary" : ""}`}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => {
+              setActiveTab(tab); 
+              if (tab === "Feedback" && !feedbackFirstPress) {
+                getFeedback();
+              }
+            }}
           >
             {tab}
           </button>

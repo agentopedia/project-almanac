@@ -139,23 +139,6 @@ const ProductViability = () => {
     setLoadingMessage("Returning to Design Thinking Agent...");
     setLoading(true);
     router.push(`/design_agent_output`);
-    // try {
-    //   // Make a GET request to the Next.js API route
-    //   const response = await fetch("/api/design_backtracking", {
-    //     method: "GET",
-    //   });
-    //   const result = await response.json();
-      
-    //   if (response.ok) {
-    //     console.log("Result from Flask server:", result);
-    //     const encodedResult = encodeURIComponent(JSON.stringify(result));
-    //     router.push(`/design_agent_output?result=${encodedResult}`);
-    //   } else {
-    //     console.error("Failed to fetch result:", result);
-    //   }
-    // } catch (error) {
-    //   console.error("Error during the GET request:", error);
-    // }
   };
 
   const handleProceedToSWEAgent = async () => {
