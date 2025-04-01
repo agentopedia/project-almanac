@@ -73,7 +73,7 @@ export default function CustomerPersona({ persona, onUpdatePersona }: CustomerPe
 
   return (
     <div style={{ marginBottom: "2rem", padding: "1rem", borderRadius: "8px", backgroundColor: "var(--primary-color)", color: "white", textAlign: "left" }}>
-      <h2  style={{ fontSize: "1.75rem", textAlign: "left" }}>Customer Persona</h2>
+      <h2  style={{ fontSize: "1.75rem", textAlign: "center" }}>Customer Persona</h2>
 
       {isEditing ? (
       <div className="editingContainer">
@@ -112,9 +112,8 @@ export default function CustomerPersona({ persona, onUpdatePersona }: CustomerPe
           <button 
             onClick={(e) => { if (isSaving) e.preventDefault(); handleSave(); }} 
             className="button button-secondary" 
-            disabled={isSaving} 
-            style={{ cursor: isSaving ? "not-allowed" : "pointer" }}>
-            {isSaving ? "Loading..." : "Save"}
+            disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
           </button>
           <button onClick={() => { handleCancel();}} style={{ padding: "0.5rem 1rem", backgroundColor: "var(--text-color-secondary)", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>Cancel</button>
         </div>

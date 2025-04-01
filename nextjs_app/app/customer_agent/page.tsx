@@ -46,6 +46,7 @@ export default function CustomerFeedbackAgent() {
   const [feedback, setFeedback] = useState<CustomerFeedback>(defaultFeedback);
   const [editedFeedback, setEditedFeedback] = useState<CustomerFeedback>(defaultFeedback);
   const [isFetching, setIsFetching] = useState<boolean>(true);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isEditingFeedback, setIsEditingFeedback] = useState<boolean>(false);
   const [feedbackFirstPress, setFeedbackFirstPress] = useState<boolean>(false);
   
@@ -90,7 +91,6 @@ export default function CustomerFeedbackAgent() {
   const getFeedback = async () => {
     setFeedbackFirstPress(true);
     setIsFetching(true);
-    console.log("getting feedback");
     //set up API route for customer feedback
     try {
       const response = await fetch("/api/customer_feedback");
@@ -107,9 +107,26 @@ export default function CustomerFeedbackAgent() {
     setIsFetching(false); 
   };
 
-  const testingDisabledButton = () => {
-    console.log("button clicked");
-  }
+  const handleSave = async () => {
+    setIsSaving(true);
+    setFeedback(editedFeedback);
+    try {
+      const response = await fetch("/api/update_feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ feedback: editedFeedback }),
+      });
+      const responseData = await response.json();
+
+      setIsEditingFeedback(false);
+    } catch (error) {
+      console.error("Error updating data in backend:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -124,7 +141,7 @@ export default function CustomerFeedbackAgent() {
         return (
           <main style={{ width: "60%" }}>
             <div style={{ marginBottom: "2rem", padding: "1rem", borderRadius: "8px", backgroundColor: "var(--primary-color)", color: "white", textAlign: "left", display: "flex", flexDirection: "column"}}>
-            <h2  style={{ fontSize: "1.75rem", textAlign: "left" }}>Customer Feedback</h2>
+            <h2  style={{ fontSize: "1.75rem", textAlign: "center" }}>Customer Feedback</h2>
             {isEditingFeedback ? (
               <div className="editingContainer">
                 {/* Input fields for editing feedback */}
@@ -156,15 +173,12 @@ export default function CustomerFeedbackAgent() {
                 
                 {/* Buttons */}
                 <div className="buttonGroup">
-                  <button className="button button-secondary"
-                    onClick={() => {
-                      setIsEditingFeedback(false);
-                      setFeedback(editedFeedback);
-                      // add functionality to save data to backend
-                    }}
-                    disabled={isFetching}>
-                    Save
-                  </button>
+                <button 
+                  onClick={(e) => { if (isSaving) e.preventDefault(); handleSave(); }} 
+                  className="button button-secondary" 
+                  disabled={isSaving}>
+                  {isSaving ? "Saving..." : "Save"}
+                </button>
                   <button onClick={() => { setEditedFeedback(feedback); setIsEditingFeedback(false);}} style={{ padding: "0.5rem 1rem", backgroundColor: "var(--text-color-secondary)", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>Cancel</button>
                 </div>
               </div>
@@ -190,7 +204,6 @@ export default function CustomerFeedbackAgent() {
                     ))}
                   </div>
                 
-
                 {/* Buttons */}
                 <div className="buttonGroup" >
                   <button className="button button-secondary" onClick={getFeedback} disabled={isFetching}>Regenerate Feedback</button>
@@ -205,10 +218,14 @@ export default function CustomerFeedbackAgent() {
 
       case "MVPs":
         return (
-          <div className="card">
-            <h2 className="cardTitle">MVPs</h2>
-            <p className="cardText">Takes you back to the SWE agent to view previous MVPs</p>
-          </div>
+          <main style={{ width: "60%" }}>
+            <div style={{ marginBottom: "2rem", padding: "1rem", borderRadius: "8px", backgroundColor: "var(--primary-color)", color: "white", textAlign: "left", display: "flex", flexDirection: "column"}}>
+            <h2  style={{ fontSize: "1.75rem", textAlign: "center" }}>MVPs</h2>
+              <p>Iterate through MVPs based on customer feedback</p>
+
+
+            </div>
+          </main>
         );
 
       default:
@@ -221,7 +238,7 @@ export default function CustomerFeedbackAgent() {
       {/* Header */}
       <header style={{ textAlign: "center", color: "white" }}>
           <h1 style={{ fontSize: "2.5rem" }}>Customer Feedback Agent</h1>
-          <p style={{ fontSize: "1.3rem" }}>Iterate through MVPs</p>
+          <p style={{ fontSize: "1.3rem" }}>Receive Feedback and Iterate through MVPs</p>
       </header>
 
       {/* Selection Tabs */}

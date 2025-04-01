@@ -211,6 +211,7 @@ def update_customer_feedback():
     feedback.last_message = json.dumps(info) #reassigning the last message to the updated customer feedback
     result = feedback.last_message
     response = {"message": "Update received", "result": result}
+    print(feedback.last_message)
     return jsonify(response), 200
 
 
