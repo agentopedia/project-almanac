@@ -84,6 +84,11 @@ p {
   margin-bottom: 1em;
 }
 
+.about-intro {
+  max-width: 66%;
+  margin-bottom: 2em;
+}
+
 /* Loading Overlay */
 .loading-overlay {
   position: fixed;

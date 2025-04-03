@@ -21,7 +21,7 @@ export default function SoftwareAgentPage() {
             <p className="text-gray-300">Review your generated MVP</p>
           </div>
 
-          <div className="flex justify-center py-6">
+          <div className="flex flex-wrap justify-center gap-4 py-6">
             <button
               onClick={() => router.push("/generatedmvp")}
               className="bg-green-600 text-white px-6 py-2 rounded-lg mr-4 hover:bg-green-700"

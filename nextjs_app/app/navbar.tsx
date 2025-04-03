@@ -9,7 +9,7 @@ export default function Navbar() {
         <Link href="/">Home</Link>
       </div>
       <div className="px-3">
-        <Link href="/about">About</Link>
+        <Link href="./about">About</Link>
       </div>
       <div className="px-3">
         <Link href="/agents">Agents</Link>
