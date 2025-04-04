@@ -21,27 +21,36 @@ export default function SoftwareAgentPage() {
             <p className="text-gray-300">Review your generated MVP</p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-4 py-6">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "1rem",
+              marginTop: "1rem"
+            }}
+          >
             <button
               onClick={() => router.push("/generatedmvp")}
-              className="bg-green-600 text-white px-6 py-2 rounded-lg mr-4 hover:bg-green-700"
+              className="navigation-buttons"
             >
               View Generated MVP
             </button>
-            
-            <button
-              onClick={() => router.push("/product_viability_agent")}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg mr-4 hover:bg-blue-700"
-            >
-              Back to Product Viability Agent
-            </button>
-            
-            <button
-              onClick={() => router.push("/")}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-            >
-              Back to Home
-            </button>
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <button
+                onClick={() => router.push("/product_viability_agent")}
+                className="navigation-buttons"
+              >
+                Back to Product Viability Agent
+              </button>
+
+              <button
+                onClick={() => router.push("/")}
+                className="navigation-buttons"
+              >
+                Back to Home
+              </button>
+            </div>
           </div>
         </>
       )}
