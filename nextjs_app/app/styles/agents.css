@@ -84,9 +84,30 @@ p {
   margin-bottom: 1em;
 }
 
+/* Home Page */
 .about-intro {
   max-width: 66%;
   margin-bottom: 2em;
+}
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: calc(100vh - 60px);
+}
+
+.main-title {
+  font-size: 3rem;
+  font-weight: bold;
+  color: white;
+}
+
+.main-subtitle {
+  font-size: 1.25rem;
+  color: #ccc;
 }
 
 /* Loading Overlay */
