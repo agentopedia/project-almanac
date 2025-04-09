@@ -110,6 +110,43 @@ p {
   color: #ccc;
 }
 
+/* Agents Page (from navbar) */
+.agents-page {
+  text-align: center;
+  padding: 2rem;
+  color: white;
+}
+
+.agent-button-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.agent-button {
+  padding: 12px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  min-width: 220px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.agent-button:hover {
+  background-color: #0056b3;
+}
+
+.agent-button.disabled {
+  background-color: #555;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
 /* Loading Overlay */
 .loading-overlay {
   position: fixed;
