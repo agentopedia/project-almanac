@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import JSON5 from "json5";
 import CustomerPersona from "../components/CustomerPersona";
 import '../styles/agents.css';
+import { useRouter } from "next/navigation";
 
 interface CustomerPersona {
   name: string;
@@ -49,6 +50,7 @@ export default function CustomerFeedbackAgent() {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isEditingFeedback, setIsEditingFeedback] = useState<boolean>(false);
   const [feedbackFirstPress, setFeedbackFirstPress] = useState<boolean>(false);
+  const router = useRouter();
   
   useEffect(() => {
     async function fetchPersona() {
@@ -222,8 +224,16 @@ export default function CustomerFeedbackAgent() {
             <div style={{ marginBottom: "2rem", padding: "1rem", borderRadius: "8px", backgroundColor: "var(--primary-color)", color: "white", textAlign: "left", display: "flex", flexDirection: "column"}}>
             <h2  style={{ fontSize: "1.75rem", textAlign: "center" }}>MVPs</h2>
               <p>Iterate through MVPs based on customer feedback</p>
-
-
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <button 
+                  className="button button-secondary" 
+                  style={{ width: "auto" }}
+                  onClick={() => {}} 
+                  disabled={isFetching}
+                >
+                  Regenerate Feedback
+                </button>
+              </div>
             </div>
           </main>
         );
@@ -259,6 +269,12 @@ export default function CustomerFeedbackAgent() {
         ))}
       </div>
       {renderContent()}
+      <div style={{ display: "flex", justifyContent: "left" }}>
+        <button onClick={() => router.push("/swe")}>
+          Back to Software Agent
+        </button>
+      </div>
     </div>
+    
   );
 }
