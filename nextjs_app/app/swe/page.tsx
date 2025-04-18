@@ -31,7 +31,10 @@ export default function SoftwareAgentPage() {
             }}
           >
             <button
-              onClick={() => router.push("/generatedmvp")}
+              onClick={() => {
+                sessionStorage.setItem("generatedMVPComplete", "true"); // for Agents page (in navbar)
+                router.push("/generatedmvp")
+              }}
               className="navigation-buttons"
             >
               View Generated MVP

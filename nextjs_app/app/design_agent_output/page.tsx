@@ -108,6 +108,7 @@ export default function DesignThinkingAgentOutput() {
       if (response.ok) {
         console.log("PRD from Flask server:", data);
         const encodedData = encodeURIComponent(JSON.stringify(data));
+        sessionStorage.setItem("productViabilityComplete", "true"); // for Agents page (in navbar)
         router.push(`/product_viability_agent?data=${encodedData}`);
       } else {
         console.error("Failed to fetch data:", data);

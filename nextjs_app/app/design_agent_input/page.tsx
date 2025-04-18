@@ -31,7 +31,10 @@ export default function DesignThinkingAgentInput() {
       const data = await res.json();
       console.log('API Response:', data);
 
-      // router.push(`/design_agent_output?result=${encodeURIComponent(JSON.stringify(data))}`);
+      sessionStorage.setItem("designThinkingComplete", "true"); // for Agents page (in navbar)
+      sessionStorage.setItem("productViabilityComplete", "false");
+      sessionStorage.setItem("sweComplete", "false");
+      sessionStorage.setItem("generatedMVPComplete", "false");
       router.push("/design_agent_output")
     } catch (error) {
       console.error("Error submitting request:", error);

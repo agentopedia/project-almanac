@@ -142,9 +142,9 @@ p {
 }
 
 .agent-button.disabled {
-  background-color: #555;
-  color: #aaa;
+  opacity: 0.5;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* Loading Overlay */

@@ -1,8 +1,13 @@
 "use client";
+import { useEffect } from 'react';
 import Link from 'next/link';
 import './styles/agents.css';
 
 export default function Home() {
+  useEffect(() => {
+    sessionStorage.setItem("productIdeationComplete", "true");
+  }, []);
+
   return (
     <main style={{ marginTop: "1rem" }}>
       <div className="home-container">

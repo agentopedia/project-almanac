@@ -79,33 +79,46 @@ const ProductViability = () => {
 */
   // parse product viability data
   useEffect(() => {
-    if (data) {
+    async function fetchViabilityData() {
       try {
-        const parsedData = JSON.parse(decodeURIComponent(data));
-
-        //check for existence
-        if (typeof parsedData.viability_result === "string") {
-          parsedData.viability_result = JSON.parse(parsedData.viability_result);
-        }
-        if (typeof parsedData.business_result === "string") {
-          parsedData.business_result = JSON.parse(parsedData.business_result);
+        let viabilityData = null;
+  
+        if (data) {
+          // parse data from URL
+          viabilityData = JSON.parse(decodeURIComponent(data));
+        } else {
+          // fetch from backend if no URL data
+          const response = await fetch("/api/viability");
+          const fetched = await response.json();
+          viabilityData = fetched;
+  
+          // mark as complete for Agents Page
+          sessionStorage.setItem("productViabilityComplete", "true");
         }
   
-        console.log("Parsed PRD:", parsedData.viability_result);
-        console.log("Parsed Business Model:", parsedData.business_result);
-
-        // merge both viability & business model data in one state
-      setParsedProductData(prevData => ({
-        ...prevData,
-        ...parsedData.viability_result, // Store Viability Agent data
-        ...parsedData.business_result // Store Business Model Agent data
-      }));
-
+        if (typeof viabilityData.viability_result === "string") {
+          viabilityData.viability_result = JSON.parse(viabilityData.viability_result);
+        }
+        if (typeof viabilityData.business_result === "string") {
+          viabilityData.business_result = JSON.parse(viabilityData.business_result);
+        }
+  
+        console.log("Parsed PRD:", viabilityData.viability_result);
+        console.log("Parsed Business Model:", viabilityData.business_result);
+  
+        setParsedProductData(prev => ({
+          ...prev,
+          ...viabilityData.viability_result,
+          ...viabilityData.business_result,
+        }));
       } catch (error) {
-        console.error("Error parsing data:", error);
+        console.error("Error loading viability data:", error);
+        setLoadingMessage("Failed to load viability data.");
       }
     }
-  }, [data]);
+  
+    fetchViabilityData();
+  }, [data]);  
 
   // set loading to false once data is available
   useEffect(() => {
@@ -159,6 +172,7 @@ const ProductViability = () => {
       }
 
       // MVP generation triggered, now navigate to SWE Agent page
+      sessionStorage.setItem("sweComplete", "true"); // for Agents page (in navbar)
       router.push("/swe");
 
     } catch (error) {
