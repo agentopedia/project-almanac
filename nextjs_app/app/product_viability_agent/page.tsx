@@ -83,18 +83,18 @@ const ProductViability = () => {
       try {
         let viabilityData = null;
   
-        if (data) {
-          // parse data from URL
-          viabilityData = JSON.parse(decodeURIComponent(data));
-        } else {
+        // if (data) {
+        //   // parse data from URL
+        //   viabilityData = JSON.parse(decodeURIComponent(data));
+        // } else {
           // fetch from backend if no URL data
-          const response = await fetch("/api/viability");
-          const fetched = await response.json();
-          viabilityData = fetched;
+        const response = await fetch("/api/viability");
+        const fetched = await response.json();
+        viabilityData = fetched;
   
-          // mark as complete for Agents Page
-          sessionStorage.setItem("productViabilityComplete", "true");
-        }
+        // mark as complete for Agents Page
+        sessionStorage.setItem("productViabilityComplete", "true");
+        // }
   
         if (typeof viabilityData.viability_result === "string") {
           viabilityData.viability_result = JSON.parse(viabilityData.viability_result);
@@ -221,13 +221,14 @@ const ProductViability = () => {
           <header style={{ textAlign: "center", marginBottom: "20px", color: "white" }}>
             <h1 style={{ fontSize: "2.5rem" }}>Product Viability Agent</h1>
             <p>Define your product requirements</p>
-            <a
+            {/* Area for downloading the Document */}
+            {/* <a
               href="/path-to-pdf"
               download="[Product Name].pdf"
               style={{ color: "var(--primary-color)", textDecoration: "underline" }}
             >
               [Product Name].pdf
-            </a>
+            </a> */}
           </header>
 
           {/* Tab Selection */}
