@@ -39,12 +39,12 @@ export default function SoftwareAgentPage() {
             >
               View Generated MVP
             </button>
-            <button
+            {/* <button
               onClick={() => router.push("/customer_agent")}
               className="navigation-buttons"
             >
               Generate Customer Feedback
-            </button>
+            </button> */}
             <div style={{ display: "flex", gap: "1rem" }}>
               <button
                 onClick={() => router.push("/product_viability_agent")}
