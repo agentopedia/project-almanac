@@ -9,6 +9,7 @@ from customer_feedback_agent import CustomerFeedbackAgent
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_tavily import TavilyExtract
 
 import json5
 import json
@@ -20,11 +21,19 @@ import traceback
 os.environ['GOOGLE_API_KEY'] = "AIzaSyCcN7Yo1ONOFYn5wCzPcBxTXfk7wyUFlko"
 gemini_api_key = os.getenv("GOOGLE_API_KEY")
 
-os.environ['TAVILY_API_KEY'] = "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" #set tavily api key here
+os.environ['TAVILY_API_KEY'] = "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" #set tavily api key here
 tavily_api_key= os.getenv("TAVILY_API_KEY")
 
 model = ChatGoogleGenerativeAI(model="gemini-2.0-flash-exp")
-tools = [TavilySearchResults(max_results = 1, api_key = tavily_api_key)]
+tools = [TavilySearchResults(
+    max_results = 1, 
+    api_key = tavily_api_key, 
+    exclude_domains = ["istockphoto.com", "shutterstock.com", "gettyimages.com", "stock.adobe.com"], 
+), TavilyExtract(
+    extract_depth="advanced", 
+    api_key=tavily_api_key, 
+    include_images=True
+)]
 
 app = Flask(__name__)
 design = DesignThinkingAgent(model, tools)
@@ -39,7 +48,7 @@ def run_agent():
     #resetting all the agents' last message
     design.last_message = ""
     viability.last_message = ""
-    swe.last_message = "" # UNCOMMENTED
+    swe.last_message = "" 
     feedback.last_message = ""
     data = request.json
     query = data['query']
@@ -144,17 +153,35 @@ def generate_mvp():
             result = swe.last_message
 
         cwd = os.getcwd() 
-        filePath = os.path.join(cwd, '..', 'app', 'generatedmvp', 'page.tsx')
-
-        # Ensure the directory exists
-        os.makedirs(os.path.dirname(filePath), exist_ok = True)
-    
-        with open(filePath, 'w') as f:
-            f.write(result)
+        
+        # Split the result at "--- CSS DIVIDER ---"
+        if "--- CSS DIVIDER ---" in result:
+            tsxCode, cssCode = result.split("--- CSS DIVIDER ---", 1)
+            # Strip any whitespace and ensure the divider is completely removed
+            tsxCode = tsxCode.strip()
+            cssCode = cssCode.strip()
+        else:
+            tsxCode = result
+            cssCode = "@tailwind base;\n@tailwind components;\n@tailwind utilities;"
+        if not cssCode.strip():
+            cssCode = "@tailwind base;\n@tailwind components;\n@tailwind utilities;"
+        
+        # Create and write to page.tsx
+        tsxFilePath = os.path.join(cwd, '..', 'app', 'generatedmvp', 'page.tsx')
+        os.makedirs(os.path.dirname(tsxFilePath), exist_ok=True)
+        with open(tsxFilePath, 'w') as f:
+            f.write(tsxCode.strip())
+            
+        # Create and write to mvp.css
+        cssFilePath = os.path.join(cwd, '..', 'app', 'generatedmvp', 'mvp.css')
+        os.makedirs(os.path.dirname(cssFilePath), exist_ok=True)
+        with open(cssFilePath, 'w') as f:
+            f.write(cssCode.strip())
 
         response = {
-            "message": "MVP generated, verified, and saved successfully.", 
-            "result": result
+            "message": "MVP TSX and CSS generated, verified, and saved as separate files.", 
+            "tsx_result": tsxCode.strip(),
+            "css_result": cssCode.strip()
         }
         return jsonify(response), 200
     except Exception as e:
@@ -169,20 +196,35 @@ def generate_context_page():
 
         verifiedCode = verifier.run(contextResult['pageContent'])
         swe.last_message = verifiedCode
-        contextResult = verifiedCode
+        
+        # Split the result at "--- CSS DIVIDER ---"
+        if "--- CSS DIVIDER ---" in verifiedCode:
+            tsxCode, cssCode = verifiedCode.split("--- CSS DIVIDER ---", 1)
+            # Strip any whitespace and ensure the divider is completely removed
+            tsxCode = tsxCode.strip()
+            cssCode = cssCode.strip()
+        else:
+            tsxCode = verifiedCode.strip()
+            cssCode = "@tailwind base;\n@tailwind components;\n@tailwind utilities;"
 
         cwd = os.getcwd() 
-        filePath = os.path.join(cwd, '..', 'app', 'generatedmvp', 'page.tsx')
-
-        # Ensure the directory exists
-        os.makedirs(os.path.dirname(filePath), exist_ok = True)
-    
-        with open(filePath, 'w') as f:
-            f.write(contextResult)
+        
+        # Create and write to page.tsx
+        tsxFilePath = os.path.join(cwd, '..', 'app', 'generatedmvp', 'page.tsx')
+        os.makedirs(os.path.dirname(tsxFilePath), exist_ok=True)
+        with open(tsxFilePath, 'w') as f:
+            f.write(tsxCode)
+            
+        # Create and write to mvp.css
+        cssFilePath = os.path.join(cwd, '..', 'app', 'generatedmvp', 'mvp.css')
+        os.makedirs(os.path.dirname(cssFilePath), exist_ok=True)
+        with open(cssFilePath, 'w') as f:
+            f.write(cssCode)
 
         response = {
-            "message": "Context page generated, verified, and saved successfully.", 
-            "result": contextResult
+            "message": "Context page generated, verified, and saved as separate files.", 
+            "tsx_result": tsxCode,
+            "css_result": cssCode
         }
         return jsonify(response), 200
     except Exception as e:
@@ -228,4 +270,4 @@ with open("flask_port.json", "w") as f:
 
 if __name__ == '__main__':
     print(f"Running Flask on port {port}")
-    app.run(host='0.0.0.0', port = port)  # Use dynamic port
+    app.run(host='0.0.0.0', port = port)  # Use dynamic portasw
