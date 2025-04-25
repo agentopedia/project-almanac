@@ -1,7 +1,5 @@
 "use client"
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import InstallBootstrap from "./components/InstallBootstrap";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import './styles/agents.css';
@@ -16,8 +14,8 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className="min-h-screen">
-        {/* conditional navbar */}
+      <body className={isGeneratedMVP ? "generatedmvp-body" : "min-h-screen"}>
+        {/* Navbar hidden for generatedMVP */}
         {!isGeneratedMVP && (
           <header className="navbar">
             <nav className="navbar-links">
@@ -27,8 +25,7 @@ export default function RootLayout({
             </nav>
           </header>
         )}
-        <InstallBootstrap />
-        <div className="container min-h-screen flex flex-col justify-center items-center">
+        <div className={isGeneratedMVP ? "generatedmvp-container" : "container min-h-screen flex flex-col justify-center items-center"}>
           {children}
         </div>
       </body>
