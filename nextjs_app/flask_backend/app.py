@@ -290,4 +290,4 @@ with open("flask_port.json", "w") as f:
 
 if __name__ == '__main__':
     print(f"Running Flask on port {port}")
-    app.run(host='0.0.0.0', port = port)  # Use dynamic portasw
+    app.run(host='0.0.0.0', port = port)  # Use dynamic port

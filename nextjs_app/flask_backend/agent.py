@@ -2,15 +2,16 @@ import os
 import json
 import operator
 from typing import TypedDict, Annotated
+import copy
 
 from langchain_core.messages import AnyMessage, SystemMessage, HumanMessage, ToolMessage
 from langgraph.graph import StateGraph, END
 
-# Agent State Definition
+# --- Agent State Definition ---
 class AgentState(TypedDict):
     messages: Annotated[list[AnyMessage], operator.add]
 
-# Base Agent Class
+# --- Base Agent Class (Modified with Print Statements) ---
 class Agent:
     def __init__(self, model, tools, system_prompt):
         print("--- Agent Initializing ---")
@@ -21,7 +22,7 @@ class Agent:
         self.model = model.bind_tools(tools)
         print("Model bound with tools.")
 
-        # Graph Definition
+        # --- Graph Definition ---
         graph = StateGraph(AgentState)
         graph.add_node("llm", self.call_openai)
         print("Added node: llm")
@@ -47,6 +48,7 @@ class Agent:
         # Compile Graph
         self.graph = graph.compile()
         print("--- Agent Graph Compiled ---")
+        # --- End Graph Definition ---
 
     def exists_action(self, state: AgentState):
         print("\n--- Checking for Action ---")
@@ -61,6 +63,8 @@ class Agent:
             return True
         else:
             print("Action Required: NO. No tool calls found in last message.")
+            # Optionally print the last message content if no tool calls
+            # print(f"Last Message Content: {result.content}")
             return False
 
     def call_openai(self, state: AgentState):
@@ -78,7 +82,7 @@ class Agent:
             print("No system prompt defined for this agent.")
             messages_to_send = messages
 
-        # Check for Tool Call / Response Counts
+        # --- Add Check for Tool Call / Response Counts ---
         if is_tool_response_turn:
             print("\n--- Verifying Tool Call/Response Counts ---")
             num_calls_requested = 0
@@ -111,9 +115,11 @@ class Agent:
             else:
                 print("Counts appear to match.")
             print("--------------------------------------------")
+        # --- End Check ---
 
-        # Final Message List
+        # --- Debug Print for final list ---
         print(f"\n--- Final message list being sent to self.model.invoke:\n{messages_to_send}\n-------------------------------------")
+        # --- End Debug Print ---
 
         # Invoke the LLM
         try:
@@ -130,7 +136,7 @@ class Agent:
         else:
             print("LLM Response does NOT include valid tool_calls.")
 
-        # Check for invalid tool calls
+        # --- : Check for INVALID tool calls ---
         if hasattr(message, 'invalid_tool_calls') and message.invalid_tool_calls:
             print(f"!!! WARNING: LLM Response includes INVALID tool_calls: {message.invalid_tool_calls}")
         else:
@@ -184,7 +190,7 @@ class Agent:
                 
             print(f"Processing tool call: {tool_name} (ID: {tool_id})")
             
-            # Handle Tavily Search Tool
+            # Handle tavily search tool
             if tool_name == "tavily_search_results_json":
                 try:
                     # Parse arguments
@@ -360,7 +366,7 @@ class Agent:
         if result_state and 'messages' in result_state and result_state['messages']:
             final_message_content = result_state['messages'][-1].content
             print(f"Final message content (raw): {final_message_content}")
-            self.last_message = self.cleanJsonContent(final_message_content)
+            self.last_message = self.cleanJsonContent(final_message_content) # Or cleanHtmlContent if needed
             print(f"Final message content (cleaned): {self.last_message}")
         else:
             print("Error: Graph did not return messages in final state.")
@@ -369,13 +375,15 @@ class Agent:
         return result_state # Return the full state as before
 
     def cleanJsonContent(self, content):
-        if not isinstance(content, str):
+        # Existing cleaning logic
+        if not isinstance(content, str): # Handle potential non-string content
              print(f"Warning: cleanJsonContent received non-string type: {type(content)}")
              content = str(content)
         content = content.strip().strip("`").replace("json", "").strip().replace("\n", "").replace("  ", "")
         return content
 
     def cleanHtmlContent(self, content):
+        # Existing cleaning logic
         if not isinstance(content, str):
              print(f"Warning: cleanHtmlContent received non-string type: {type(content)}")
              content = str(content)
