@@ -54,7 +54,7 @@ class SWESystemAgent(Agent):
         1. The primary endpoint for API communication is '/api/swe_model', which should be used for any user interaction (form submissions/button clicks/etc.)
         and ensure proper error handling.
         2. All components should make fetch requests to send data to the Flask backend.
-        3. Create responsive designs that work on BOTH mobile and desktop devices.
+        3. Create responsive designs that work on mobile and desktop
         4. MANDATORY: You MUST use the `tavily_search_results_json` tool to generate ALL external links, URLs, and images by following the WORKFLOW above. This is non-negotiable.
         5. MANDATORY: Always extract and use multiple images from the Tavily search results when appropriate. Access them through the "images" array in each response.
 
@@ -1598,11 +1598,12 @@ class SWESystemAgent(Agent):
 
         # Construct the input message for the graph based on the user interaction
         # This message needs to provide the LLM with enough context to generate the next page.
-        # Combine the interaction details and implicitly reference the main system prompt
+        # We combine the interaction details and implicitly reference the main system prompt
         # which the graph's call_openai method will prepend.
-        # Also need to give the instruction to generate the *next* page based on this context.
+        # We also need to give the instruction to generate the *next* page based on this context.
 
         # Include essential context in the human message.
+        # Mentioning the previous page structure might be useful contextually.
         # The LLM should infer the next step based on its system prompt instructions about CUJs.
 
         contextualInput = f"""
@@ -1621,7 +1622,7 @@ class SWESystemAgent(Agent):
         Generate the complete code for the next React component in the user journey. Ensure the generated component is fully functional, adheres to all styling and technical requirements, uses Tavily correctly for any external resources, 
         includes the necessary API call structure for further navigation, and only permits 'navigate' as the action value for fetch requests. Make sure to ONLY return the React component code.
 
-        REMEMBER: This is the workflow you have to follow:
+        Remember: This is the workflow you have to follow.
 
         WORKFLOW TO FOLLOW: To generate the final React component code, you MUST follow these steps precisely:
         1. Analyze and Plan: Analyze the request (either the initial PRD or the context for the next page). Identify ALL external images or links required for the current page you are creating. 
@@ -1629,7 +1630,7 @@ class SWESystemAgent(Agent):
            Once you have identified all the resources you need, proceed to Step 2.
         
         2. Call Tool: Initiate the necessary call(s) to the `tavily_search_results_json` tool based on your plan (one at a time) (e.g. if you need 3 resources, call the tool 3 times), up to a maximum of 5 calls. 
-           You cannot call the tool more than 5 times because it will exceed the API limit. IMPORTANT: When requesting images, specifically mention "free image" in your query (e.g., "Leo Messi football player free image"). 
+           You cannot call the tool more than 5 times because it will exceed the API limit. IMPORTANT: When requesting images, specifically mention "image" in your query (e.g., "Leo Messi football player image"). 
            Once all your resources have been acquired, proceed to Step 3.
 
         3. Generate Component: After receiving the results from the tool(s), generate the complete React component code, utilizing the actual image URLs obtained from the Tavily response. Use these URLs directly as static strings within the `src` attributes in the component.

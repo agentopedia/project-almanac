@@ -83,36 +83,38 @@ class SWEVerifierAgent(Agent):
         super().__init__(model, tools, prompt)
     
     def run(self, inputCode):
+        """Runs the verification process."""
         print("--- Verifier: Starting Run ---")
         
         # Check if the code contains a CSS divider
-        hasCssDivider = "--- CSS DIVIDER ---" in inputCode
+        has_css_divider = "--- CSS DIVIDER ---" in inputCode
         
-        if hasCssDivider:
+        if has_css_divider:
             print("--- Verifier: Detected CSS Divider ---")
             # Split the code at the divider
-            tsxCode, cssCode = inputCode.split("--- CSS DIVIDER ---", 1)
+            tsx_code, css_code = inputCode.split("--- CSS DIVIDER ---", 1)
             
             # Clean and fix both parts separately
-            fixedTsx = self.processCodePart(tsxCode)
-            fixedCss = self.processCodePart(cssCode, isCss=True)
+            fixed_tsx = self.process_code_part(tsx_code)
+            fixed_css = self.process_code_part(css_code, is_css=True)
             
             # Recombine with the divider preserved
-            finalCode = fixedTsx + "\n\n--- CSS DIVIDER ---\n\n" + fixedCss
-            self.lastMessage = finalCode
+            final_code = fixed_tsx + "\n\n--- CSS DIVIDER ---\n\n" + fixed_css
+            self.last_message = final_code
             print("--- Verifier: Run Complete (with CSS Divider) ---")
-            return finalCode
+            return final_code
         else:
             # Process as a single piece of code (original behavior)
-            return self.processCodePart(inputCode)
+            return self.process_code_part(inputCode)
     
-    def processCodePart(self, code, isCss=False):
+    def process_code_part(self, code, is_css=False):
         """Process a single part of the code (either TSX or CSS)."""
-        print(f"--- Verifier: Processing {'CSS' if isCss else 'TSX'} Part ---")
+        print(f"--- Verifier: Processing {'CSS' if is_css else 'TSX'} Part ---")
         
         cleanedCode = self.initialCleanup(code)
         
-        if isCss:
+        # For CSS, just remove markdown formatting and leave it alone
+        if is_css:
             print("--- Verifier: Preserving CSS code (no LLM processing) ---")
             return cleanedCode
         else:
@@ -123,19 +125,19 @@ class SWEVerifierAgent(Agent):
             result = super().run(cleanedCode) 
             
             # Extract the LLM's final proposed code
-            llmFixedCode = result['messages'][-1].content
+            llm_fixed_code = result['messages'][-1].content
             
             # Perform final cleanup on the LLM's output
-            finalCode = self.finalCleanup(llmFixedCode)
+            final_code = self.finalCleanup(llm_fixed_code)
             
             # Add CSS import if missing
-            finalCode = self.addCssImportIfMissing(finalCode)
+            final_code = self.addCSSImportIfMissing(final_code)
             
             # Ensure "use client" directive is at the top
-            finalCode = self.ensureUseClientDirective(finalCode)
+            final_code = self.ensureUseClientDirective(final_code)
         
-        print(f"--- Verifier: Finished Processing {'CSS' if isCss else 'TSX'} Part ---")
-        return finalCode
+        print(f"--- Verifier: Finished Processing {'CSS' if is_css else 'TSX'} Part ---")
+        return final_code
     
     def initialCleanup(self, code):
         """Removes initial markdown formatting."""
@@ -149,6 +151,9 @@ class SWEVerifierAgent(Agent):
         # Remove any remaining markdown code blocks
         code = re.sub(r'```(?:jsx|javascript|js|react|typescript|ts|css)?\n?', '', code)
         code = re.sub(r'```', '', code)
+        
+        # We're not preserving "use client" directive here anymore as we'll add it separately
+        # with the ensureUseClientDirective method
             
         # Remove any explanatory text before the first import or component definition
         # Look for the first line that starts with 'import', 'export', 'const', 'let', 'var', 'function', 'class', or is '<' (JSX)
@@ -163,6 +168,7 @@ class SWEVerifierAgent(Agent):
                  break
             elif not strippedLine: # Allow empty lines before code starts
                  continue
+            # else: if it's some other text, we assume it's preamble to be removed
         
         code = "\n".join(codeLines[startIndex:])
         
@@ -185,32 +191,32 @@ class SWEVerifierAgent(Agent):
         # Pattern to find <style jsx> or <style jsx global> tags
         pattern = re.compile(r'(<style\s+jsx(?:\s+global)?\s*>)\s*\{([^\`].*?)\}\s*(</style>)', re.DOTALL | re.IGNORECASE)
 
-        def replaceStyleContent(match):
-            tagOpen = match.group(1)
+        def replace_style_content(match):
+            tag_open = match.group(1)
             content = match.group(2).strip() # Get the content, strip whitespace
-            tagClose = match.group(3)
+            tag_close = match.group(3)
             if content and not content.startswith('`') and not content.endswith('`'):
                  print(f"Fixing style jsx content: {content[:50]}...") # Debug
-                 return f"{tagOpen}{{`{content}`}}{tagClose}"
+                 return f"{tag_open}{{`{content}`}}{tag_close}"
             elif not content:
-                 return f"{tagOpen}{{``}}{tagClose}" # Ensure empty styles also have backticks
+                 return f"{tag_open}{{``}}{tag_close}" # Ensure empty styles also have backticks
             else:
                  return match.group(0) # Return original if already has backticks or is complex
 
-        fixedCode = re.sub(pattern, replaceStyleContent, code)
+        fixed_code = re.sub(pattern, replace_style_content, code)
         # Handle case where style tag might be empty {}
-        fixedCode = re.sub(r'(<style\s+jsx(?:\s+global)?\s*>)\s*\{\s*\}\s*(</style>)', r'\1{``}\2', fixedCode, flags=re.IGNORECASE)
-        return fixedCode
+        fixed_code = re.sub(r'(<style\s+jsx(?:\s+global)?\s*>)\s*\{\s*\}\s*(</style>)', r'\1{``}\2', fixed_code, flags=re.IGNORECASE)
+        return fixed_code
 
 
     def fixErrorTemplates(self, code):
         """Adds backticks to Error('...${...}...') calls."""
         # Pattern looks for Error(...) where the content inside has ${...} but no backticks
-        # Captures the Error( part, the content, and the closing )
-        # Avoids matching if the content already starts with `
+        # It captures the Error( part, the content, and the closing )
+        # It avoids matching if the content *already* starts with `
         pattern = re.compile(r'(Error\s*\(\s*)(?!`)([^)]*?\${[^}]+?}[^)]*?)(\s*\))', re.DOTALL)
 
-        def replaceErrorTemplate(match):
+        def replace_error_template(match):
             prefix = match.group(1) # e.g., "Error("
             content = match.group(2).strip()
             suffix = match.group(3) # e.g., ")"
@@ -220,16 +226,18 @@ class SWEVerifierAgent(Agent):
                 return f"{prefix}`{content}`{suffix}"
             return match.group(0) # Return original match if already correct
 
-        return re.sub(pattern, replaceErrorTemplate, code)
+        return re.sub(pattern, replace_error_template, code)
 
     def fixClassNameTemplates(self, code):
         """Fixes className={`...`} missing backticks."""
         # This pattern looks for className={...} where the content contains ${}
         # and is likely a string concatenation or direct template needing backticks.
+        # It's tricky because valid JS expressions can be inside {}.
+        # We focus on cases that look like strings mixed with ${}.
         
-        # Direct interpolation like className={badge ${...}}
+        # Case 1: Direct interpolation like className={badge ${...}}
         pattern1 = re.compile(r'(className=\{)(?!`)([^"}]+?\$\{[^}]+?\}[^"}]*?)(\})')
-        def replaceClassTemplate1(match):
+        def replace_class_template1(match):
             prefix = match.group(1)
             content = match.group(2).strip()
             suffix = match.group(3)
@@ -238,7 +246,12 @@ class SWEVerifierAgent(Agent):
                  print(f"Fixing className template (direct): {content[:50]}...") # Debug
                  return f'{prefix}`{content}`{suffix}'
             return match.group(0)
-        code = re.sub(pattern1, replaceClassTemplate1, code)
+        code = re.sub(pattern1, replace_class_template1, code)
+
+        # Case 2: Concatenation like className={"string " + (condition ? `${...}` : `${...}`)}
+        # This is harder and potentially risky to auto-fix with regex.
+        # The general template literal fixer might catch parts of this.
+        # We will rely on the LLM and the general fixer for more complex cases.
 
         return code
 
@@ -248,87 +261,95 @@ class SWEVerifierAgent(Agent):
         # Matches function calls directly within the onClick handler.
         # Looks for an unquoted argument containing ${...}
         pattern = re.compile(r'(onClick=\{\s*\(?\)?\s*=>\s*\w+\s*\()([^)]*?)(?!`)([^)]*?\$\{[^}]+?\}[^)]*?)(\))')
-        
-        def replaceOnclickArgTemplate(match):
-            prefix = match.group(1) # e.g., "onClick={() => func("
-            argPrefix = match.group(2) # Any content before our match
-            content = match.group(3).strip() # e.g., "something_${variable}"
-            suffix = match.group(4) # e.g., ")"
-            
-            # Check if it looks like a potential template string missing backticks
-            if '${' in content and '`' not in content:
-                print(f"Fixing onClick template: {prefix}{argPrefix}{content}{suffix}") # Debug
-                if argPrefix.strip():
-                    # If there's other content before our match, be conservative
-                    # Only fix if it's clearly a string (argPrefix ends with quote or comma)
-                    if argPrefix.rstrip().endswith(('"', "'", ',')):
-                        return f'{prefix}{argPrefix}`{content}`{suffix}'
-                    else:
-                        return match.group(0)  # Don't modify complex expressions
-                else:
-                    # No prefix - safe to add backticks
-                    return f'{prefix}`{content}`{suffix}'
-            return match.group(0)  # Return original if not a clear template string case
-            
-        return re.sub(pattern, replaceOnclickArgTemplate, code)
+
+        def replace_onclick_arg_template(match):
+            prefix = match.group(1) # onClick={...func(
+            args_before = match.group(2) # Arguments before the problematic one
+            problem_arg = match.group(3).strip() # The argument with ${} and no backticks
+            suffix = match.group(4) # ) closing the function call
+
+            # Check if the argument seems like a template literal missing backticks
+            if '${' in problem_arg and '`' not in problem_arg and not problem_arg.startswith("'") and not problem_arg.startswith('"'):
+                print(f"Fixing onClick template argument: {problem_arg[:50]}...") # Debug
+                # Be careful about adding commas if needed
+                separator = ''
+                if args_before.strip() and not args_before.strip().endswith(','):
+                    separator = ', '
+                return f"{prefix}{args_before}{separator}`{problem_arg}`{suffix}"
+            return match.group(0) # Return original if no fix needed
+
+        return re.sub(pattern, replace_onclick_arg_template, code)
 
     def fixGeneralTemplates(self, code):
-        """Catches any other ${var} used without backticks in JavaScript expressions."""
-        # More general pattern to find ${...} not inside backticks
-        pattern = re.compile(r'=\s*(?!`)([^;}"\'`]*?\${[^}]+?}[^;}"\'`]*?)(?!`)\s*[;,)]', re.DOTALL)
+        """Finds simple string literals ("..." or '...') containing ${...} and converts them to `...`."""
+        # This pattern targets standard strings that accidentally contain ${}
+        # It captures the opening quote (group 1), the content (group 2), and the closing quote (group 3, matching group 1)
+        pattern = re.compile(r'(["\'])([^"\'\`]*?\${[^}]+?}[^"\'\`]*?)(\1)')
+
+        def replace_general_template(match):
+            quote = match.group(1) # " or '
+            content = match.group(2)
+            # If the captured content actually contains a template literal placeholder ${...}
+            if '${' in content:
+                print(f"Fixing general template: {content[:50]}...") # Debug output
+                # Escape any existing backticks within the content to avoid breaking the new template literal
+                content = content.replace('`', '\\`') 
+                # Return the content wrapped in backticks
+                return f'`{content}`'
+            # If no ${} was found within this quoted string, return the original match unchanged
+            return match.group(0) 
+
+        # Apply the substitution using the pattern and the replacement function across the entire code
+        return re.sub(pattern, replace_general_template, code)
+
+    def addCSSImportIfMissing(self, code):
+        """Simply adds the CSS import if it doesn't exist"""
+        if 'import "./mvp.css"' in code or "import './mvp.css'" in code:
+            print("--- Verifier: CSS import already exists ---")
+            return code
+            
+        # Split the code into lines
+        lines = code.split('\n')
         
-        def replaceGeneralTemplate(match):
-            content = match.group(1).strip()
-            # Only wrap content in backticks if it doesn't already contain operators or reserved words
-            # that would make it an invalid template literal
-            # More cautious to avoid breaking complex expressions
-            if ('${' in content and '`' not in content and
-                not re.search(r'[+\-*/%&|^<>=!?]', content) and 
-                not re.search(r'\b(function|return|if|else|switch|case|break|continue|for|while|do)\b', content)):
-                print(f"Fixing general template: {content[:50]}...") # Debug
-                return f'= `{content}` '
-            return match.group(0)  # Return original if not a simple case
+        # Check if 'use client' directive exists
+        has_use_client = False
+        use_client_index = -1
         
-        return re.sub(pattern, replaceGeneralTemplate, code)
-
-    def addCssImportIfMissing(self, code):
-        """Adds CSS import if missing for generatedmvp pages."""
-        """Adds CSS import if missing for generatedmvp pages."""
-        # Check if this is a component for the generated MVP
-        isGeneratedMvp = re.search(r'router\.push\s*\(\s*[\'"]\/generatedmvp[\'"]', code) or \
-                      re.search(r'as\s+a\s+route\s+to\s+/generatedmvp', code) or \
-                      re.search(r'\bwindow\.location\.pathname\s*===\s*[\'"]\/generatedmvp[\'"]', code) or \
-                      re.search(r'pathname\s*===\s*[\'"]\/generatedmvp[\'"]', code)
-
-        # Check if the file might be a Next.js page/component
-        isNextComponent = ('import React' in code or 'import { use' in code or 
-                         'use client' in code or 'export default function' in code)
-
-        # Check if a CSS import is already present
-        hasCssImport = re.search(r'import\s+[\'"].*\.css[\'"]', code)
-
-        # Add CSS import if needed
-        if isGeneratedMvp and isNextComponent and not hasCssImport:
-            print("Adding CSS import for generatedmvp component")
-            if 'use client' in code:
-                # Add import after "use client"
-                code = re.sub(r'((?:\'|")use client(?:\'|").*?\n)', r'\1\nimport "../styles/agents.css";\n', code)
-            else:
-                # Add import at the beginning
-                code = 'import "../styles/agents.css";\n\n' + code
-
-        return code
+        for i, line in enumerate(lines):
+            if line.strip() in ['"use client"', "'use client'"]:
+                has_use_client = True
+                use_client_index = i
+                break
+        
+        # Always add the CSS import as the first import
+        if has_use_client:
+            # Add directly after 'use client' with no empty line in between
+            lines.insert(use_client_index + 1, 'import "./mvp.css";')
+            print("--- Verifier: Added CSS import directly after 'use client' directive ---")
+        else:
+            # No 'use client' found, add at the very beginning
+            lines.insert(0, 'import "./mvp.css";')
+            print("--- Verifier: Added CSS import at the beginning of the file ---")
+        
+        return '\n'.join(lines)
         
     def ensureUseClientDirective(self, code):
-        """Ensures 'use client' directive is at the top of React component files."""
-        needsUseClient = ('useState' in code or 'useEffect' in code or 'useRouter' in code or 
-                        'onClick=' in code or 'onChange=' in code or 'fetch(' in code)
+        """Ensures 'use client' directive is at the top of the file"""
+        lines = code.split('\n')
         
-        # Check if the directive already exists
-        hasUseClient = re.search(r'(?:\'|")use client(?:\'|")', code)
+        # Check if use client directive already exists
+        has_use_client = False
+        for line in lines:
+            if line.strip() == '"use client";' or line.strip() == "'use client';" or line.strip() == '"use client"' or line.strip() == "'use client'":
+                has_use_client = True
+                break
         
-        if needsUseClient and not hasUseClient:
-            print("Adding 'use client' directive")
-            return '"use client";\n\n' + code
+        if not has_use_client:
+            print("--- Verifier: Adding 'use client' directive to the top of the file ---")
+            lines.insert(0, '"use client";')
+            
+            # Add an empty line after use client for better readability
+            if len(lines) > 1:
+                lines.insert(1, '')
         
-        return code
+        return '\n'.join(lines)
