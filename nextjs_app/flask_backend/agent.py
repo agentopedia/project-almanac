@@ -126,7 +126,7 @@ class Agent:
         print(f"LLM Response Content: {message.content}")
 
         if hasattr(message, 'tool_calls') and message.tool_calls:
-         print(f"LLM Response includes VALID tool_calls: {message.tool_calls}")
+            print(f"LLM Response includes VALID tool_calls: {message.tool_calls}")
         else:
             print("LLM Response does NOT include valid tool_calls.")
 
@@ -337,7 +337,8 @@ class Agent:
             # Create a proper ToolMessage with required content field
             tool_message = ToolMessage(
                 content=result_str,
-                tool_call_id=tool_id
+                tool_call_id=tool_id,
+                name = tool.name
             )
             
             actions.append(tool_message)

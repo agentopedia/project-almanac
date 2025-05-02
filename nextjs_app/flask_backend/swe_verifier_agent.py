@@ -15,15 +15,16 @@ class SWEVerifierAgent(Agent):
         Some guidelines to follow: 
 
         1. Get rid of any placeholders. Anything that even mentions placeholder must be properly deleted (e.g. comments, img tags, text). 
-        2. Ensure proper imports for React components and hooks (especially useRouter). 
-           There should not be any duplications unless necessary.
+        2. Ensure proper imports for React components and hooks (especially useRouter). Without proper icon imports from lucide-react and react-icons, the app will 
+           contain an error, rendering it unusable for users.
         3. Ensure proper directives (like 'use client').
         4. For any $ used within string interpolation, make sure the string is enclosed in backticks (`). THIS IS CRITICAL. Check attributes, function calls, Error constructors, and style tags.
-        5. Make sure all API calls use the correct endpoint format as specified.
+        5. Make sure all API calls are made to /api/swe_model. If you see any other API calls, change the path to /api/swe_model.
         6. Ensure all event handlers are properly defined and used.
         7. Verify that state management is implemented correctly.
         8. Ensure there are no non-ASCII characters in the application.
         9. Define all the parameters. No parameter should implicitly be of type "any".
+        10. Ensure the line import "./mvp.css" exists under the use client directive.
 
         Additionally, make sure there's a back button to the SWE model at the end of the component, implemented like this:
 
@@ -293,7 +294,6 @@ class SWEVerifierAgent(Agent):
 
     def addCssImportIfMissing(self, code):
         """Adds CSS import if missing for generatedmvp pages."""
-        """Adds CSS import if missing for generatedmvp pages."""
         # Check if this is a component for the generated MVP
         isGeneratedMvp = re.search(r'router\.push\s*\(\s*[\'"]\/generatedmvp[\'"]', code) or \
                       re.search(r'as\s+a\s+route\s+to\s+/generatedmvp', code) or \
@@ -312,10 +312,10 @@ class SWEVerifierAgent(Agent):
             print("Adding CSS import for generatedmvp component")
             if 'use client' in code:
                 # Add import after "use client"
-                code = re.sub(r'((?:\'|")use client(?:\'|").*?\n)', r'\1\nimport "../styles/agents.css";\n', code)
+                code = re.sub(r'((?:\'|")use client(?:\'|").*?\n)', r'\1\nimport "./mvp.css";\n', code)
             else:
                 # Add import at the beginning
-                code = 'import "../styles/agents.css";\n\n' + code
+                code = 'import "./mvp.css";\n\n' + code
 
         return code
         
