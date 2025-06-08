@@ -1,6 +1,6 @@
 # 🧠 Project Almanac — Agents as the Backend
 
-Welcome to the open-source repository of **Project Almanac**, a platform that turns product ideas into working MVPs using autonomous AI agents.
+Welcome to the open-source repository of **Project Almanac**, a platform that turns product ideas into working web apps using autonomous AI agents.
 
 > 📌 TL;DR: Agents don’t generate backend code here — they *are* the backend.  
 > Agents act as live, intelligent, tool-connected services powering each phase of the product lifecycle.
@@ -9,7 +9,7 @@ Welcome to the open-source repository of **Project Almanac**, a platform that tu
 
 ## 🚀 What is Project Almanac?
 
-Almanac is an agentic platform that lets users go from **idea to MVP** with zero code.  
+Almanac is an agentic platform that lets users go from **idea to app** with zero code.  
 Each major step — from customer research to product requirements to full-stack prototyping — is handled by a specialized agent that acts as the system backend, connected to APIs, search tools, and databases.
 
 This repo contains the full source code for:
