@@ -18,13 +18,11 @@ import socket
 import re
 import traceback
 
-# os.environ['GOOGLE_API_KEY'] = "AIzaSyCcN7Yo1ONOFYn5wCzPcBxTXfk7wyUFlko"
-# os.environ['GOOGLE_API_KEY'] = 'AIzaSyBWkci81KcDP9DGdTt_ur3o12m47gYqXec'
-os.environ['GOOGLE_API_KEY'] = 'AIzaSyDS0oliZQP5gmpmoGKURXh4fQSxUZnPMg0'
+os.environ['GOOGLE_API_KEY'] = ''
 
-gemini_api_key = os.getenv("GOOGLE_API_KEY")
+gemini_api_key = os.getenv("GOOGLE_API_KEY") #visit Google AI Studio to get one
 
-os.environ['TAVILY_API_KEY'] = "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" #set tavily api key here
+os.environ['TAVILY_API_KEY'] = "" #set tavily api key here
 tavily_api_key= os.getenv("TAVILY_API_KEY")
 
 model = ChatGoogleGenerativeAI(model="gemini-2.0-flash-exp")
