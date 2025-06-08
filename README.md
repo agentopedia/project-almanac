@@ -1,67 +1,83 @@
-Agent-Based System for Problem Solving with OpenAI and LangChain
+# 🧠 Project Almanac — Agents as the Backend
 
-This repository contains a Python script for creating an agent-based system that breaks down problems into sub-tasks, assigns tasks to different agents, and provides feedback loops to improve the task execution. The system utilizes the OpenAI GPT-3.5 model and LangChain framework for natural language processing and tool integrations.
+Welcome to the open-source repository of **Project Almanac**, a platform that turns product ideas into working MVPs using autonomous AI agents.
 
-Overview
-The system follows these steps:
+> 📌 TL;DR: Agents don’t generate backend code here — they *are* the backend.  
+> Agents act as live, intelligent, tool-connected services powering each phase of the product lifecycle.
 
-Problem Breakdown: The system uses a planner agent to break down a given problem into smaller sub-tasks.
-Agent Task Execution: Each sub-task is executed by a randomly chosen agent, simulating different expertise (e.g., Researcher, Product Manager).
-Feedback Loop: A critique agent reviews the outputs, providing feedback and prompting re-execution if necessary.
-Final Compilation: The results are compiled into a final output.
+---
 
-Requirements
+## 🚀 What is Project Almanac?
 
-Ensure you have the following libraries installed:
+Almanac is an agentic platform that lets users go from **idea to MVP** with zero code.  
+Each major step — from customer research to product requirements to full-stack prototyping — is handled by a specialized agent that acts as the system backend, connected to APIs, search tools, and databases.
 
-pip install -qU langchain-openai langchain langchain_community openai
-Environment Setup
-Set up the following environment variables to authenticate your API keys:
+This repo contains the full source code for:
+- 🌐 A Next.js frontend
+- 🧪 A Flask + LangChain agent backend
+- 🧠 Modular agents for Design Thinking, Product Viability, Business Model Generation, and Software Engineering
+- 🧾 Persistent data storage using MongoDB Atlas
 
-os.environ["OPENAI_API_KEY"] = "<Your_OpenAI_API_Key>"
-os.environ['TAVILY_API_KEY'] = '<Your_Tavily_API_Key>'
+---
 
-Key Components
-PlannerAgent: Breaks down the problem into sub-tasks using the OpenAI model.
-TaskAgent: Executes individual sub-tasks by querying the OpenAI model, simulating various agents.
-CritiqueAgent: Reviews the outputs and provides feedback to guide improvement.
-AgentSystem: The main system that orchestrates task execution, feedback, and final result compilation.
+## 🧩 How It Works
 
-Usage
-Here’s an example of how to use the system to solve a problem:
+Almanac’s flow consists of a sequence of AI agents, each one specializing in a stage of product development. The frontend simply acts as the renderer — the agents are the logic layer.
 
-if __name__ == "__main__":
-    problem = "Analyze the impact of AI on education"
-    system = AgentSystem()
-    final_result = system.run(problem)
-    print("Final Result:")
-    print(final_result)
+### Agent Flow
 
-Step-by-Step Breakdown
+1. **Product Ideation**  
+   Input a product idea on the first screen.
 
-Run the system: The AgentSystem starts by breaking down the provided problem (e.g., "Analyze the impact of AI on education") into 3 sub-tasks.
+2. **Design Thinking Agent**  
+   Generates:
+   - Customer Persona (name, age, job, context)
+   - Empathy Map (says, thinks, does, feels)
+   - Customer Journey Map (awareness → install)
+   - Problem Statement
 
-Agent Execution: Each sub-task is randomly assigned to an agent (e.g., Researcher, Expert, Product Manager), and the agent's model generates a response.
+3. **Product Viability & Business Model Agents**  
+   Generates:
+   - 📝 PRD (Goals, Features, Functional/Non-Functional Reqs)
+   - 💼 Business Model (Target Market, Revenue Streams, Channels)
 
-Feedback: The critique agent evaluates the results against the original plan and provides feedback for improvement.
+4. **Software Engineering Agent**  
+   Builds:
+   - 🎯 Interactive MVP UI
+   - 🧠 RAG-powered content using Tavily
+   - 🎨 Dynamic pages with working buttons/forms
 
-Rework and Final Output: The system re-runs the task execution based on feedback and outputs a final result.
+5. **Frontend**  
+   Renders the JSON output from each agent as styled React pages with state syncing to MongoDB.
 
-Example Output
+---
 
-Final Result:
-Researcher: AI is transforming education by offering personalized learning experiences.
-Product Manager: Integration of AI tools is increasing efficiency in educational institutions.
-Expert: AI helps in assessing student performance with greater accuracy.
+## 🧠 Philosophy: Agents *Are* the Backend
 
-Customization
-You can add more agents by extending the choose_agent() function.
-Modify the feedback loop logic to implement more sophisticated feedback mechanisms.
+Almanac's core thesis:
 
-Future Enhancements
-Improve agent selection based on the specific nature of the sub-task.
-Extend feedback and critique mechanisms to involve multiple iterations.
-Incorporate more detailed task execution methods to simulate real-world problem-solving.
+> Instead of writing backend code that wraps APIs, stores logic, and moves data — let intelligent agents handle it **in real-time**.
 
-License
-This project is open-source and available under the MIT License.
+- No YAML workflows.
+- No prompt-chains.
+- No server-side code generation.
+- Just stateful, context-rich agents that act as backend services.
+
+---
+
+## 📁 Folder Structure
+
+```bash
+nextjs_app/
+├── components/          # React components (e.g. EmpathyMap, JourneyMap)
+├── pages/               # Each major agent page
+├── styles/              # agents.css, mvp.css
+├── api/                 # API routes for frontend-backend communication
+├── flask_backend/       
+│   ├── agent.py         # Base agent class
+│   ├── design_agent.py
+│   ├── business_model_agent.py
+│   ├── viability_agent.py
+│   ├── swe_agent.py
+│   └── swe_verifier_agent.py
+└── app.py               # Flask app routing backend agent services
