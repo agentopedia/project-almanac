@@ -1684,18 +1684,3 @@ class SWESystemAgent(Agent):
             result = super().run(inputData)
         return result
 
-# Example usage
-# os.environ['GOOGLE_API_KEY'] = "AIzaSyCmUDbVAOGcRZcOKP4q6mmeZ7Gx1WgE3vE"
-# os.environ['TAVILY_API_KEY'] = "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"
-
-# gemini_api_key = os.getenv("GOOGLE_API_KEY")
-# tavily_api_key = os.getenv("TAVILY_API_KEY")
-
-# model = ChatGoogleGenerativeAI(model="gemini-2.0-flash-exp")
-# tools = [TavilySearchResults(max_results = 1, api_key = tavily_api_key)]
-
-# swe_agent = SWESystemAgent(model, tools)
-
-# prdcontent = "{\"introduction\": [\"This product is a comprehensive online resource for learning about frog species. It addresses the current lack of a single, accurate, and engaging platform for biology students and professors to access information on various frog species. The platform aims to provide a superior learning experience by centralizing information, improving accuracy, and enhancing engagement.\"],\"goals\": [\"Create a central, easily accessible online resource for information on frog species.\",\"Provide accurate and up-to-date information, eliminating the need to consult multiple sources.\",\"Enhance the learning experience through engaging content and interactive features.\",\"Improve the efficiency of information retrieval for both students and professors.\"],\"target_audience\": [\"Biology students at all academic levels (high school, undergraduate, and graduate).\",\"Biology professors and educators.\",\"Researchers studying amphibians and frog species.\",\"Individuals with a general interest in learning about frog species.\"],\"product_features\": [\"Comprehensive database of frog species: including taxonomy, morphology, habitat, behavior, distribution, and conservation status.\",\"High-quality images and videos of various frog species.\",\"Interactive maps showing the geographic distribution of frog species.\",\"Quizzes and assessments to test knowledge and understanding.\",\"Search functionality to easily find specific frog species or information.\",\"Downloadable resources, such as fact sheets and presentations.\",\"News and updates on frog research and conservation efforts.\"],\"functional_requirements\": [\"The platform should be accessible on various devices (desktops, tablets, and smartphones).\",\"The database should be regularly updated with new information and species.\",\"The search functionality should be efficient and accurate.\",\"The platform should be user-friendly and intuitive to navigate.\",\"The platform should be secure and protect user data.\",\"The platform should be able to handle a large volume of users and data.\"],\"nonfunctional_requirements\": [\"The platform should be accurate and reliable.\",\"The platform should be engaging and visually appealing.\",\"The platform should be easy to use and navigate.\",\"The platform should be accessible to users with disabilities.\",\"The platform should be scalable to accommodate future growth.\",\"The platform should meet industry standards for security and privacy.\"]}"
-# result = swe_agent.run(prdcontent)
-# print(result['messages'][-1].content)
