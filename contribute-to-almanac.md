@@ -12,7 +12,7 @@ We welcome contributions in all forms: bug fixes, new features, agent ideas, doc
 2. **Clone your fork**
 
 ```bash
-git clone https://github.com/your-username/almanac.git
+git clone https://github.com/agentopedia/project-almanac.git
 cd almanac
 ```
 
