@@ -13,7 +13,7 @@ We welcome contributions in all forms: bug fixes, new features, agent ideas, doc
 
 ```bash
 git clone https://github.com/agentopedia/project-almanac.git
-cd almanac
+cd almanac/nextjs_app
 ```
 
 3. **Create a new branch**
