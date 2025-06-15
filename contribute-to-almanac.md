@@ -2,69 +2,98 @@
 
 Thanks for your interest in contributing to **Project Almanac** — where agents aren't just helpers, they *are* the backend.
 
-We welcome contributions in all forms: bug fixes, new features, agent ideas, documentation updates, or wild experiments.
+This guide will help you get started, contribute effectively, and earn recognition within the Almanac community.
 
 ---
 
-## 🛠 How to Contribute
+## 🌍 Why Join Us?
 
-1. **Fork the repository**
-2. **Clone your fork**
+Project Almanac is not just code — it’s **the beginning of a new way to build software**:
+- ✅ Agents handle the backend.
+- ✅ MVPs generate themselves.
+- ✅ You help shape the future of product development.
+
+And we believe *contributors deserve more than swag*. Around here, you get **recognition**, **access**, and **influence**.
+
+---
+
+## 🪜 Step 1: Setting Up Locally
+
+1️⃣ **Fork the Repo** → https://github.com/your-username/almanac  
+2️⃣ **Clone Your Fork**:
 
 ```bash
-git clone https://github.com/agentopedia/project-almanac.git
+git clone https://github.com/your-username/almanac.git
 cd almanac/nextjs_app
 ```
 
-3. **Create a new branch**
-
+3️⃣ **Run the Stack Locally**:
 ```bash
-git checkout -b my-feature-branch
+# Backend
+cd flask_backend
+pip install -r requirements.txt
+python app.py
+
+# Frontend
+cd ../
+npm install
+npm run dev
 ```
 
-4. **Make your changes**
-   - Add new agents in `flask_backend/`
-   - Modify prompts, improve UI, or fix bugs
-   - Keep commits atomic and meaningful
-
-5. **Run the full pipeline locally**
-   - Start Flask backend (`python app.py`)
-   - Start Next.js frontend (`npm run dev`)
-   - Make sure your changes don’t break other agents
-
-6. **Submit a Pull Request**
-   - Include a short description of what you changed and why
-   - Link to any related issue
+4️⃣ Visit **http://localhost:3000**  
+→ Type your product idea → Watch agents build → Explore the outputs!
 
 ---
 
-## 🌟 Contributor Ideas
+## ✨ How Can I Contribute?
 
-- Add new agent types (e.g., customer_feedback_agent, marketing_agent)
-- Improve prompt templates or agent chaining logic
-- Enhance UI/UX with Tailwind or animation
-- Write tests for Flask API routes or LangChain logic
-- Create tutorials or walkthroughs in `/docs`
+- 🧠 **Add a new agent** → Example: `customer_feedback_agent.py`
+- 🖋️ **Improve the prompts** → Better empathy maps, sharper PRDs
+- 🎨 **Enhance the UI** → New components, dark mode, better mobile views
+- 🧪 **Experiment** → Chain agents, try alternative tool integrations
+- 📖 **Write documentation** → Tutorials, walkthroughs, troubleshooting
 
----
-
-## 📄 Code Style & Conventions
-
-- Python: follow [PEP8](https://peps.python.org/pep-0008/)
-- JS/TS: use Prettier and ESLint
-- Use descriptive variable names and add comments for prompts/tool use
+Check open issues → or propose your own by opening a GitHub Issue.
 
 ---
 
-## 🧠 Communication
+## 🏅 Recognition & Rewards
 
-Feel free to open a GitHub Issue if you have:
-- A feature idea
-- A bug report
-- A question about agent behavior or architecture
+Here’s how we recognize awesome contributors:
 
-Or email [Sai](mailto:saicharantej99@gmail.com) directly if you want to discuss larger collaboration.
+| 🎁 **Reward**             | 💬 **Description**                                           |
+|---------------------------|-------------------------------------------------------------|
+| 🏛 **Agent Council Access**   | Private Discord group for roadmap discussions     |
+| 🖼️ **Digital Badges & Frames** | Personalized badges for GitHub & profile pictures            |
+| 📝 **Public Recognition**     | Your name & profile featured on our README + social shoutouts |
+| 🎓 **Masterclass Invites**    | Access to closed-door deep-dives on agent architectures       |
+| 🏆 **Digital Certificates**   | Personalized digital certificates of contribution (Verifiable) |
+
+**Example Contributor Title →** `🏆 Core Agent Contributor — Almanac 2025`
 
 ---
 
-Let's build the future of agentic product development — together.
+## 🚨 Contributor Hall of Fame (So Far)
+
+| Name              | Contribution Highlights                            |
+|-------------------|---------------------------------------------------|
+| Karen Garcia      | System architecture, agent coordination           |
+| Ashley Hummel     | Frontend development, UI/UX design                |
+| Neo Tyagi         | API integration, backend Flask implementation     |
+| Aditi Kelwalkar   | Frontend development, validation, documentation   |
+
+Want your name here next? 👇 Submit your first PR!
+
+---
+
+## 🧠 Need Help?
+
+- 📬 **Email:** [AI Quotient](mailto:aiquotientgpt@gmail.com)
+- 🗨️ **GitHub Discussions:** Use Issues or Discussions tab
+- 🛡️ **Bug Fixes:** Open an issue before starting on a big one!
+
+---
+
+Let’s build the future of autonomous software development — *together*.
+
+**Welcome to the Agentic Era.** ⚡
