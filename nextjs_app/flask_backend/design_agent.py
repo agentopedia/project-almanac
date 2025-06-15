@@ -27,15 +27,3 @@ class DesignThinkingAgent(Agent):
         self.product_idea = inputData
         result = super().run(inputData)
         return result
-# # example usage of this class
-# os.environ['GOOGLE_API_KEY'] = "AIzaSyCmUDbVAOGcRZcOKP4q6mmeZ7Gx1WgE3vE"
-# gemini_api_key = os.getenv("GOOGLE_API_KEY")
-# os.environ['TAVILY_API_KEY'] = "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" #set tavily api key here
-# tavily_api_key= os.getenv("TAVILY_API_KEY")
-
-# tools = [TavilySearchResults(max_results = 1, api_key = tavily_api_key)]
-# model = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
-# design = DesignThinkingAgent(model, tools)
-# result = design.run("web app about caligraphy")
-# print(result['messages'][-1].content) #last message's content
-
