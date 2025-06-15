@@ -9,7 +9,7 @@ from langgraph.graph import StateGraph, END
 
 from typing import TypedDict, Annotated
 
-os.environ['GOOGLE_API_KEY'] = "AIzaSyCmUDbVAOGcRZcOKP4q6mmeZ7Gx1WgE3vE"
+os.environ['GOOGLE_API_KEY'] = ""
 gemini_api_key = os.getenv("GOOGLE_API_KEY")
 tavily_api_key = os.environ['TAVILY_API_KEY']
 
