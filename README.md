@@ -18,9 +18,7 @@ This repo contains the full source code for:
 - 🧠 Modular agents for Design Thinking, Product Viability, Business Model Generation, and Software Engineering
 - 🧾 Persistent data storage using MongoDB Atlas
 
-Want to see Almanac in action? Watch the walkthrough:
-
-(https://www.youtube.com/watch?v=NsgrmdYgOOY)
+Want to see Almanac in action? Watch the walkthrough: https://www.youtube.com/watch?v=NsgrmdYgOOY
 
 ---
 
