@@ -20,7 +20,7 @@ This repo contains the full source code for:
 
 Want to see Almanac in action? Watch the walkthrough:
 
-[![Watch the video](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=NsgrmdYgOOY)
+(https://www.youtube.com/watch?v=NsgrmdYgOOY)
 
 ---
 
